@@ -1,4 +1,4 @@
-///widget demonstratie pas-cu-pas pt cofactorul matricei laplaciene
+///widget calcul pas-cu-pas pt cofactorul matricei laplaciene
 ///se injecteaza in #theme2-body dupa ce marked.parse() a terminat
 ///depinde doar de stilurile CSS ale platformei (variabile --accent, --bg-card etc.)
 
@@ -426,7 +426,7 @@
   const widget = document.createElement("div");
   widget.className = "cbm2-proof";
   widget.innerHTML = `
-<div class="cbm2-proof-title">Demonstrație pas cu pas — Teorema lui Kirchhoff</div>
+<div class="cbm2-proof-title">Calculul pas cu pas — Teorema lui Kirchhoff</div>
 <p class="cbm2-proof-sub">Urmărește cum se calculează cofactorul matricei laplaciene și de ce este egal cu numărul de arbori.</p>
 
 <div class="cbm2-pf-graph-select">
