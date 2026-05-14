@@ -95,7 +95,7 @@ Pentru $K_4$: valorile proprii sunt $0, 4, 4, 4$, deci $\tau(K_4) = \frac{1}{4} 
 | $K_n$ (complet) | $n$ | $n^{n-2}$ (formula Cayley) |
 | $C_n$ (ciclu) | $n$ | $n$ |
 | $P_n$ (lanț) | $n$ | $1$ |
-| $K_{3,3}$ (bipartit complet) | $6$ | $729$ |
+| $K_{3,3}$ (bipartit complet) | $6$ | $81$ |
 | Hipercub $Q_3$ | $8$ | $384$ |
 
 **Formula lui Cayley** ($\tau(K_n) = n^{n-2}$) este un caz special elegant: graful complet pe $n$ noduri are exact $n^{n-2}$ arbori de acoperire. Pentru $n = 4$: $4^2 = 16$. Se poate demonstra și combinatoric (prin coduri Prüfer), dar teorema lui Kirchhoff o dă *gratuit* din calculul valorilor proprii.
