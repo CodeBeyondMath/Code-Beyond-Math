@@ -180,7 +180,7 @@ loadMarkdown('md/tema1.md', 'theme1-body').then(() => {
 
 loadMarkdown('md/tema2.md', 'theme2-body').then(() => {
   const sp = document.createElement('script');
-  sp.src = 'tema2-proof-widget.js';
+  sp.src = 'tema2-calc-widget.js';
   document.body.appendChild(sp);
 
   const s = document.createElement('script');
