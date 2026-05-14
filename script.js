@@ -194,6 +194,11 @@ loadMarkdown('md/tema3.md', 'theme3-body').then(() => {
   document.body.appendChild(s);
 });
 
-loadMarkdown('md/tema4.md', 'theme4-body');
+loadMarkdown('md/tema4.md', 'theme4-body').then(() => {
+  const s = document.createElement('script');
+  s.src = 'tema4-widget.js';
+  document.body.appendChild(s);
+});
+
 loadMarkdown('md/tema5.md', 'theme5-body');
 loadMarkdown('md/tema6.md', 'theme6-body');
