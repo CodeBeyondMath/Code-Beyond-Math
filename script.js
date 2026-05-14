@@ -201,4 +201,9 @@ loadMarkdown('md/tema4.md', 'theme4-body').then(() => {
 });
 
 loadMarkdown('md/tema5.md', 'theme5-body');
-loadMarkdown('md/tema6.md', 'theme6-body');
+
+loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
+  const s = document.createElement('script');
+  s.src = 'tema6-widget.js';
+  document.body.appendChild(s);
+});
