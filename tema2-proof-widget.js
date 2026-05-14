@@ -5,9 +5,6 @@
 (function () {
   "use strict";
 
-  ///============================================================
-  /// CSS
-  ///============================================================
   const style = document.createElement("style");
   style.textContent = `
 .cbm2-proof {
@@ -465,7 +462,7 @@
   if (body) body.appendChild(widget);
 
   ///============================================================
-  ///Randare pasilor
+  ///Randarea pasilor
   ///============================================================
   const STEP_LABELS = ["Construim L", "Ștergem L̃", "Calculăm det", "Concluzie"];
 
