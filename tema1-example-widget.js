@@ -829,11 +829,11 @@
 
     resultsEl.innerHTML = `
       ${pipelineHTML([
-        { name: "Text", val: text.length > 20 ? text.slice(0, 18) + "…" : text, highlight: false },
-        { name: "Permutare", val: `seed=${permSeed}`, highlight: false },
-        { name: "Matrice T", val: `3×${numCols}`, highlight: false },
-        { name: "K · T", val: "=", highlight: false },
-        { name: "Matrice C", val: `3×${numCols}`, highlight: true },
+        { icon: "", name: "Text", val: text.length > 20 ? text.slice(0, 18) + "…" : text, highlight: false },
+        { icon: "", name: "Permutare", val: `seed=${permSeed}`, highlight: false },
+        { icon: "", name: "Matrice T", val: `3×${numCols}`, highlight: false },
+        { icon: "", name: "K · T", val: "=", highlight: false },
+        { icon: "", name: "Matrice C", val: `3×${numCols}`, highlight: true },
       ])}
 
       <hr class="cbm1-sep">
@@ -993,11 +993,11 @@
 
     resultsEl.innerHTML = `
       ${pipelineHTML([
-        { name: "Matrice C", val: `3×${numCols}`, highlight: false },
-        { name: "K⁻¹ · C", val: "=", highlight: false },
-        { name: "Matrice T", val: `3×${numCols}`, highlight: false },
-        { name: "Perm. inversă", val: `seed=${permSeed}`, highlight: false },
-        { name: "Text original", val: recovered.length > 14 ? recovered.slice(0, 12) + "…" : recovered, highlight: true },
+        { icon: "", name: "Matrice C", val: `3×${numCols}`, highlight: false },
+        { icon: "", name: "K⁻¹ · C", val: "=", highlight: false },
+        { icon: "", name: "Matrice T", val: `3×${numCols}`, highlight: false },
+        { icon: "", name: "Perm. inversă", val: `seed=${permSeed}`, highlight: false },
+        { icon: "", name: "Text original", val: recovered.length > 14 ? recovered.slice(0, 12) + "…" : recovered, highlight: true },
       ])}
 
       <hr class="cbm1-sep">
