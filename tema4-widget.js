@@ -38,10 +38,6 @@
     return { idx: minI, dist: minD };
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     2. CSS — foloseste variabilele site-ului
-  ═══════════════════════════════════════════════════════════ */
-
   const style = document.createElement('style');
   style.textContent = `
 .ppd-wrap {
@@ -261,7 +257,7 @@
   document.head.appendChild(style);
 
   /* ═══════════════════════════════════════════════════════════
-     3. HELPERS DOM + CANVAS
+     2. HELPERS DOM + CANVAS
   ═══════════════════════════════════════════════════════════ */
 
   function el(tag, cls) {
@@ -290,9 +286,9 @@
     ctx.closePath();
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     4. WIDGET
-  ═══════════════════════════════════════════════════════════ */
+  /*═══════════════════════════════════════════════════════════
+      3. WIDGET
+    ═══════════════════════════════════════════════════════════ */
 
   const dpr      = Math.min(window.devicePixelRatio || 1, 2);
   let   mode     = 'grid';
@@ -359,7 +355,6 @@
   if (bodyEl) bodyEl.appendChild(wrap);
 
   /* ─────── panele canvas ─────── */
-
   function rebuildPanels() {
     canvasArea.innerHTML = '';
     canvases = {};
@@ -392,8 +387,7 @@
     attachCanvasEvents();
   }
 
-  /* ─────── events ─────── */
-
+  /* ─────── eventuri ─────── */
   tabBar.addEventListener('click', e => {
     const btn = e.target.closest('.ppd-tab');
     if (!btn || btn.dataset.mode === mode) return;
@@ -413,7 +407,7 @@
   circleChk.addEventListener('change', () => { showCircles = circleChk.checked; schedule(); });
   gridChk.addEventListener('change',   () => { showGrid    = gridChk.checked;   schedule(); });
 
-  ///tema site-ului se poate schimba la runtime — redeseneaza canvas la toggle
+  ///tema site-ului se poate schimba la runtime - redeseneaza canvas la toggle
   document.getElementById('themeToggle')?.addEventListener('click', () => {
     ///asteapta sa se aplice atributul data-theme, apoi redeseneaza
     requestAnimationFrame(() => schedule());
@@ -445,7 +439,6 @@
   }
 
   /* ─────── render ─────── */
-
   function scaleInfo(cv) {
     const W  = cv.parentElement.clientWidth || 300;
     const pad = 26;
@@ -470,7 +463,7 @@
     const col = id === 'grid' ? C.grid : C.hex;
     const pts = id === 'grid' ? gridPts(l) : hexPts(l);
 
-    ///ridimensionare
+    ///redimensionare
     if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) {
       cv.width  = Math.round(W * dpr);
       cv.height = Math.round(H * dpr);
@@ -601,7 +594,6 @@
   }
 
   /* ─────── stats ─────── */
-
   function updateStats() {
     const gPts = gridPts(l), hPts = hexPts(l);
     const ng   = gPts.length, nh = hPts.length;
@@ -661,8 +653,6 @@
   }
 
   /* ─────── init ─────── */
-
   rebuildPanels();
   schedule();
-
 })();
