@@ -1,45 +1,250 @@
 <!DOCTYPE html>
 <html lang="ro" data-theme="light">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Platformă educațională de matematică și informatică">
-  <title>Code Beyond Math</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
-  <script defer src="script.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Platformă educațională de matematică și informatică">
+<title>Code Beyond Math</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+<script defer src="script.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
+
+<!-- ============================================================
+     ADAUGIRI NOI – Mută blocul de mai jos în style.css
+     ============================================================ -->
+<style>
+/* ---------- Dropdown "Teme" din nav ---------- */
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-dropdown-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.2s;
+}
+
+.nav-dropdown-btn:hover {
+  opacity: 0.75;
+}
+
+.nav-dropdown-arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+  font-size: 0.7em;
+}
+
+.nav-dropdown-btn[aria-expanded="true"] .nav-dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  min-width: 270px;
+  border-radius: 14px;
+  z-index: 2000;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.2s ease;
+
+  /* Light mode (default) */
+  background: #ffffff;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  color: #1a1a1a;
+}
+
+/* Dark mode */
+[data-theme="dark"] .nav-dropdown-menu {
+  background: #1e2227;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #e8e8e8;
+}
+
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.nav-dropdown-menu.open {
+  display: block;
+}
+
+.nav-dropdown-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: background 0.18s;
+
+  /* Light mode separator */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+[data-theme="dark"] .nav-dropdown-menu a {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+.nav-dropdown-menu a:last-child {
+  border-bottom: none;
+}
+
+.nav-dropdown-menu a:hover {
+  /* Light mode hover */
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .nav-dropdown-menu a:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nav-dropdown-menu a .dd-num {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.45;
+  letter-spacing: 0.05em;
+  min-width: 22px;
+}
+
+/* ---------- Navigare mini-site ---------- */
+/* Ascunde toate theme-pages implicit */
+.theme-page {
+  display: none;
+}
+
+/* Main view ascuns când e activ un mini-site */
+#main-view.hidden {
+  display: none;
+}
+
+/* Mini-site activ */
+.theme-page.active {
+  display: block;
+  min-height: calc(100vh - 60px); /* 60px = aproximativ înălțimea header-ului */
+}
+
+/* Buton înapoi în mini-site */
+.mini-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: inherit;
+  margin-bottom: 28px;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  text-decoration: none;
+}
+
+.mini-back-btn:hover {
+  background: var(--accent, #6c63ff);
+  color: #fff;
+  border-color: var(--accent, #6c63ff);
+}
+
+.mini-back-btn svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+</style>
+<!-- ============================================================
+     SFÂRŞIT bloc CSS nou
+     ============================================================ -->
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="header-inner">
-      <a class="logo" href="#">Code <span>Beyond</span> Math</a>
-      <nav class="main-nav">
-        <a href="#about">Despre</a>
-        <a href="#themes">Teme</a>
-      </nav>
-      <button class="theme-toggle" id="themeToggle" aria-label="Comutare temă">
-        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-        </svg>
-        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
-    </div>
-  </header>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="showMain(); return false;">Code <span>Beyond</span> Math</a>
+    <nav class="main-nav">
+      <a href="#about" onclick="showMain();">Despre</a>
+
+      <!-- ===== DROPDOWN TEME – NOU ===== -->
+      <div class="nav-dropdown">
+        <button
+          class="nav-dropdown-btn"
+          id="temeDropdownBtn"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="temeDropdownMenu"
+        >
+          Teme <span class="nav-dropdown-arrow">▾</span>
+        </button>
+        <div class="nav-dropdown-menu" id="temeDropdownMenu" role="menu">
+          <a href="#" role="menuitem" onclick="showTheme('theme1'); return false;">
+            <span class="dd-num">01</span> Criptarea prin matrice
+          </a>
+          <a href="#" role="menuitem" onclick="showTheme('theme2'); return false;">
+            <span class="dd-num">02</span> Numărul de arbori dintr-un graf
+          </a>
+          <a href="#" role="menuitem" onclick="showTheme('theme3'); return false;">
+            <span class="dd-num">03</span> Algoritmii de FFT și NTT
+          </a>
+          <a href="#" role="menuitem" onclick="showTheme('theme4'); return false;">
+            <span class="dd-num">04</span> Împachetarea punctelor în pătrat
+          </a>
+          <a href="#" role="menuitem" onclick="showTheme('theme5'); return false;">
+            <span class="dd-num">05</span> Jocul Haosului
+          </a>
+          <a href="#" role="menuitem" onclick="showTheme('theme6'); return false;">
+            <span class="dd-num">06</span> Conway's Game of Life
+          </a>
+        </div>
+      </div>
+      <!-- ===== SFÂRŞIT DROPDOWN ===== -->
+
+    </nav>
+    <button class="theme-toggle" id="themeToggle" aria-label="Comutare temă">
+      <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ===================================================
+     MAIN VIEW: hero + despre + teme (grila)
+     Acesta este ecranul principal / meniu
+     =================================================== -->
+<div id="main-view">
 
   <section class="hero">
     <canvas id="bg-canvas"></canvas>
@@ -76,121 +281,241 @@
       <h2 class="section-title">Teme</h2>
       <p class="section-subtitle">Alege o temă pentru a explora conceptele</p>
       <div class="themes-grid">
-        <a href="#theme1" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme1'); return false;">
           <span class="card-num">01</span>
           <h3>Criptarea prin matrice</h3>
           <p>Scurtă descriere despre criptarea prin matrice.</p>
         </a>
-        <a href="#theme2" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme2'); return false;">
           <span class="card-num">02</span>
           <h3>Numărul de arbori dintr-un graf</h3>
           <p>Descriere scurtă despre numărul de arbori dintr-un graf.</p>
         </a>
-        <a href="#theme3" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme3'); return false;">
           <span class="card-num">03</span>
           <h3>Algoritmii de FFT și NTT</h3>
           <p>Descriere scurtă despre FFT și NTT.</p>
         </a>
-        <a href="#theme4" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme4'); return false;">
           <span class="card-num">04</span>
           <h3>Împachetarea punctelor în pătrat</h3>
           <p>Descriere scurtă despre împachetarea punctelor în pătrat.</p>
         </a>
-        <a href="#theme5" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme5'); return false;">
           <span class="card-num">05</span>
           <h3>Jocul Haosului</h3>
           <p>Descriere scurtă despre jocul haosului.</p>
         </a>
-        <a href="#theme6" class="theme-card">
+
+        <a href="#" class="theme-card" onclick="showTheme('theme6'); return false;">
           <span class="card-num">06</span>
           <h3>Conway's Game of Life</h3>
           <p>Descriere scurtă despre Conway's Game of Life.</p>
         </a>
+
       </div>
     </div>
   </section>
 
-  <section class="theme-page" id="theme1">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 01</span>
-        <h2 class="theme-page-title">Criptarea prin matrice</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme1-body" class="theme-page-body markdown-body"></div>
+</div><!-- /#main-view -->
+
+<!-- ===================================================
+     MINI-SITE-URI TEME
+     Fiecare secțiune apare ca o pagină separată
+     când e selectată din dropdown sau din grilă.
+     =================================================== -->
+
+<section class="theme-page" id="theme1">
+  <div class="container">
+    <!-- Buton înapoi -->
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 01</span>
+      <h2 class="theme-page-title">Criptarea prin matrice</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme1-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <div class="theme-sep"></div>
-
-  <section class="theme-page" id="theme2">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 02</span>
-        <h2 class="theme-page-title">Numărul de arbori dintr-un graf</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme2-body" class="theme-page-body markdown-body"></div>
+<section class="theme-page" id="theme2">
+  <div class="container">
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 02</span>
+      <h2 class="theme-page-title">Numărul de arbori dintr-un graf</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme2-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <div class="theme-sep"></div>
-
-  <section class="theme-page" id="theme3">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 03</span>
-        <h2 class="theme-page-title">Algoritmii de FFT și NTT</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme3-body" class="theme-page-body markdown-body"></div>
+<section class="theme-page" id="theme3">
+  <div class="container">
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 03</span>
+      <h2 class="theme-page-title">Algoritmii de FFT și NTT</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme3-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <div class="theme-sep"></div>
-
-  <!-- Tema 4 = problema de mate cu enuntul:
-        "Fie un patrat de latura l. Care este numarul maxim de puncte ce pot incapea in patrat si sunt la distanta cel putin 1?" -->
-  <section class="theme-page" id="theme4">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 04</span>
-        <h2 class="theme-page-title">Împachetarea punctelor în pătrat</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme4-body" class="theme-page-body markdown-body"></div>
+<!-- Tema 4 = problema de mate cu enuntul:
+              "Fie un patrat de latura l. Care este numarul maxim de puncte ce pot incapea in patrat si sunt la distanta cel putin 1?" -->
+<section class="theme-page" id="theme4">
+  <div class="container">
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 04</span>
+      <h2 class="theme-page-title">Împachetarea punctelor în pătrat</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme4-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <div class="theme-sep"></div>
-
-  <section class="theme-page" id="theme5">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 05</span>
-        <h2 class="theme-page-title">Jocul Haosului</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme5-body" class="theme-page-body markdown-body"></div>
+<section class="theme-page" id="theme5">
+  <div class="container">
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 05</span>
+      <h2 class="theme-page-title">Jocul Haosului</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme5-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <div class="theme-sep"></div>
-
-  <section class="theme-page" id="theme6">
-    <div class="container">
-      <div class="theme-page-header">
-        <span class="theme-page-num">Tema 06</span>
-        <h2 class="theme-page-title">Conway's Game of Life</h2>
-        <div class="theme-page-accent"></div>
-      </div>
-      <div id="theme6-body" class="theme-page-body markdown-body"></div>
+<section class="theme-page" id="theme6">
+  <div class="container">
+    <button class="mini-back-btn" onclick="showMain()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Înapoi la meniu
+    </button>
+    <div class="theme-page-header">
+      <span class="theme-page-num">Tema 06</span>
+      <h2 class="theme-page-title">Conway's Game of Life</h2>
+      <div class="theme-page-accent"></div>
     </div>
-  </section>
+    <div id="theme6-body" class="theme-page-body markdown-body"></div>
+  </div>
+</section>
 
-  <footer class="site-footer">
-    <p>Code Beyond Math &copy; <span id="year"></span></p>
-  </footer>
+<footer class="site-footer">
+  <p>Code Beyond Math &copy; <span id="year"></span></p>
+</footer>
+
+<!-- ============================================================
+     ADAUGIRI NOI – Mută blocul de mai jos la SFÂRŞITUL script.js
+     (înainte de closing tag /body sau adaugă în script.js)
+     ============================================================ -->
+<script>
+(function () {
+  /* ---- Navigare mini-site ---- */
+
+  function showTheme(id) {
+    // Ascunde main view
+    document.getElementById('main-view').classList.add('hidden');
+    // Ascunde toate temele
+    document.querySelectorAll('.theme-page').forEach(function (el) {
+      el.classList.remove('active');
+    });
+    // Afișează tema dorită
+    var target = document.getElementById(id);
+    if (target) target.classList.add('active');
+    // Scroll la vârf
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Închide dropdown-ul
+    closeDropdown();
+  }
+
+  function showMain() {
+    document.getElementById('main-view').classList.remove('hidden');
+    document.querySelectorAll('.theme-page').forEach(function (el) {
+      el.classList.remove('active');
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    closeDropdown();
+  }
+
+  // Expunem global pentru onclick-urile din HTML
+  window.showTheme = showTheme;
+  window.showMain  = showMain;
+
+  /* ---- Dropdown "Teme" ---- */
+
+  var dropdownBtn  = document.getElementById('temeDropdownBtn');
+  var dropdownMenu = document.getElementById('temeDropdownMenu');
+
+  function openDropdown() {
+    dropdownMenu.classList.add('open');
+    dropdownBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeDropdown() {
+    dropdownMenu.classList.remove('open');
+    dropdownBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  dropdownBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (dropdownMenu.classList.contains('open')) {
+      closeDropdown();
+    } else {
+      openDropdown();
+    }
+  });
+
+  // Închide dropdown la click în afara lui
+  document.addEventListener('click', function (e) {
+    if (!dropdownMenu.contains(e.target) && e.target !== dropdownBtn) {
+      closeDropdown();
+    }
+  });
+
+  // Închide dropdown la Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeDropdown();
+  });
+})();
+</script>
+<!-- ============================================================
+     SFÂRŞIT bloc JS nou
+     ============================================================ -->
 
 </body>
 </html>
