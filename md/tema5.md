@@ -76,3 +76,9 @@ Structuri precum creierul și plămânii au dimensiuni fractale ridicate datorit
 <div style="text-align: center;">
   <img src="poze/3.png" alt="descriere" style="width: 100%; max-width: 500px;">
 </div>
+
+## Resurse pentru aprofundare suplimentară
+
+- [**Dr Why** - Chaos Game](https://chaosgame.drwhy.ai/how-to-read-this-book.html): informatii suplimentare, cu detalii matematice
+- [**Deep Dive Dev** - *Chaos Game - A Surprising Method To Generate Fractal Patterns*](https://www.youtube.com/watch?v=Y_o9Vo5nTT0) (YouTube): mai multe moduri de a genera fractali
+- [**Mathematical Visual Proofs** - *Six Sierpiński Triangle Constructions (visual mathematics)*](https://www.youtube.com/watch?v=IZHiBJGcrqI) (YouTube): 6 moduri de constructie a triunghiului lui Sierpinski si legatura cu triunghiul lui Pascal
