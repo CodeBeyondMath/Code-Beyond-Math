@@ -1,4 +1,4 @@
-# Introducere
+## Introducere
 
 **Conway's Game of Life** nu este un joc în sensul obișnuit — nu există jucători, nu există decizii, nu există câștigători. Este un **automat celular**, inventat în 1970 de matematicianul britanic **John Horton Conway**, care a demonstrat ceva uluitor: din patru reguli elementare aplicate unei grile infinite de celule, poate emerge orice comportament computațional imaginabil.
 
@@ -6,7 +6,7 @@
 
 ---
 
-# Configurația inițială
+## Configurația inițială
 
 Universul jocului este o **grilă bidimensională infinită** de celule, fiecare putând fi în una din două stări:
 
@@ -21,7 +21,7 @@ Numărul de vecini vii al celulei $(i, j)$ la pasul $t$ este: $$n_{i,j}^{(t)} = 
 
 ---
 
-# Cele patru reguli
+## Cele patru reguli
 
 Starea la pasul $t+1$ depinde exclusiv de starea la pasul $t$ și de numărul de vecini vii:
 
@@ -36,17 +36,17 @@ Regulile sunt adesea notate compact ca **B3/S23** (Birth la 3 vecini, Survival l
 
 ---
 
-# Tipuri de configurații
+## Tipuri de configurații
 
 Comportamentul pe termen lung al unei configurații inițiale se clasifică în mai multe categorii.
 
-## Configurații statice (*Still Lifes*)
+### Configurații statice (*Still Lifes*)
 
 Nu se modifică de la un pas la altul: $s^{(t+1)} = s^{(t)}$. Sunt configurații în care fiecare celulă vie are exact 2 sau 3 vecini vii, iar fiecare celulă moartă adiacentă are mai puțin sau mai mult de 3 vecini vii.
 
 Exemple clasice: **Block** (pătrat $2 \times 2$), **Beehive** (hexagon), **Loaf**, **Boat**. Cel mai mic *still life* are 4 celule.
 
-## Oscilatoare (*Oscillators*)
+### Oscilatoare (*Oscillators*)
 
 Revin periodic la configurația inițială după $p$ pași, unde $p \geq 2$ se numește **perioadă**: $$s^{(t+p)} = s^{(t)}$$
 
@@ -58,7 +58,7 @@ Revin periodic la configurația inițială după $p$ pași, unde $p \geq 2$ se n
 
 Au fost descoperite oscilatoare pentru orice perioadă $p \geq 2$.
 
-## Nave spațiale (*Spaceships*)
+### Nave spațiale (*Spaceships*)
 
 Se deplasează pe grilă menținând forma (sau revenind la ea periodic după translatare). Viteza maximă posibilă este $c = 1\ \text{celulă/pas}$ (limita cosmică a universului Conway).
 
@@ -66,19 +66,19 @@ Se deplasează pe grilă menținând forma (sau revenind la ea periodic după tr
 - **Lightweight Spaceship (LWSS)** — $p = 4$, viteza $\frac{c}{2}$ pe orizontală.
 - **Middleweight și Heavyweight Spaceships** — variante mai mari.
 
-## Configurații în creștere
+### Configurații în creștere
 
 Unele configurații cresc indefinit, generând mereu celule noi.
 
-- **Glider Gun** (tunul lui Gosper, 1970) — produce câte un glider la fiecare 30 de generații; a fost primul pattern descoperit cu populație infinită. Conway oferise un premiu de 50$ pentru descoperirea lui.
+- **Glider Gun** (tunul lui Gosper, 1970) — produce câte un glider la fiecare 30 de generații; a fost primul pattern descoperit cu populație infinită. Conway oferise un premiu de 50 de dolari pentru descoperirea lui.
 - **Puffer Train** — se deplasează lăsând în urmă structuri stabile sau oscilatoare.
 - **Breeders** — cresc pătratic; produc multiple *guns* sau *puffers*.
 
 ---
 
-# Universalitate și calcul
+## Universalitate și calcul
 
-## Completitudine Turing
+### Completitudine Turing
 
 Cel mai profund rezultat despre Game of Life: este **Turing-complet**. Orice calcul realizabil de o mașină Turing poate fi simulat într-o configurație inițială a jocului.
 
@@ -89,11 +89,11 @@ Construcția folosește:
 
 Din aceste primitive se pot construi: registre, memorie, unitate aritmetică — deci un calculator complet.
 
-## Von Neumann universality
+### Von Neumann universality
 
 În 2010, Andrew Wade a demonstrat că în Game of Life există configurații **auto-replicante** — pattern-uri care, după suficiente generații, produc copii exacte ale lor înșiși. Aceasta realizează programul lui von Neumann din anii 1940 despre auto-reproducerea mașinilor.
 
-## Nedecidabilitate
+### Nedecidabilitate
 
 Din completitudinea Turing decurg rezultate de nedecidabilitate directe:
 
@@ -102,15 +102,15 @@ Din completitudinea Turing decurg rezultate de nedecidabilitate directe:
 
 ---
 
-# Proprietăți matematice
+## Proprietăți matematice
 
-## Reversibilitate
+### Reversibilitate
 
 Game of Life **nu este reversibil**: o configurație poate avea mai mulți predecesori sau niciun predecesor (*Garden of Eden*). Primele configurații *Garden of Eden* au fost demonstrate teoretic de Edward Moore în 1962 și construite explicit de Roger Banks și alții în 1971.
 
 Numărul de configurații fără predecesor este infinit.
 
-## Densitate și faza
+### Densitate și faza
 
 Comportamentul statistic al configurațiilor aleatoare depinde de **densitatea inițială** $\rho_0 = P(\text{celulă vie})$:
 
@@ -120,13 +120,13 @@ Comportamentul statistic al configurațiilor aleatoare depinde de **densitatea i
 
 Există o **tranziție de fază** în jurul acestei densități critice, analog tranziției lichid-gaz din fizica statistică.
 
-## Entropie și compresie
+### Entropie și compresie
 
 Configurațiile tipice după multe generații au **entropie informațională** mai mică decât configurații aleatorii de aceeași densitate — structurile emergente (oscilatoare, still lifes) sunt mai compresibile decât zgomotul pur.
 
 ---
 
-# Conexiuni matematice și aplicații
+## Conexiuni matematice și aplicații
 
 **Teoria automatelor celulare** — Game of Life este cel mai studiat automat celular 2D. John von Neumann proiectase anterior automatul celular cu 29 de stări și auto-replicare; Conway a arătat că 2 stări sunt suficiente.
 
@@ -140,7 +140,7 @@ Configurațiile tipice după multe generații au **entropie informațională** m
 
 ---
 
-# Patterns notabile și recorduri
+## Patterns notabile și recorduri
 
 | Pattern | Tip | Perioadă / Viteză | Celule |
 |---------|-----|-------------------|--------|
@@ -156,7 +156,7 @@ Configurațiile tipice după multe generații au **entropie informațională** m
 
 ---
 
-# Notație și generalizări
+## Notație și generalizări
 
 Game of Life este regula **B3/S23** dintr-o familie vastă de automate celulare cu același tip de grilă și vecinătate:
 
@@ -169,7 +169,7 @@ Familia completă a automatelor celulare cu vecinătate Moore și 2 stări are $
 
 ---
 
-# Concluzie
+## Concluzie
 
 Conway's Game of Life demonstrează că **complexitatea nu necesită reguli complexe**. Patru reguli, două stări, o grilă infinită — și obții un univers Turing-complet, capabil de auto-replicare, calcul arbitrar și comportament impredictibil.
 
