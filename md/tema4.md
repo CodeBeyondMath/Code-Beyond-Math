@@ -1,128 +1,178 @@
-# Introducere
+## Introducere
 
-Împachetarea punctelor într-un pătrat este o problemă de **geometrie combinatorică**: dat un pătrat de latură $l$, câte puncte putem plasa în interiorul său (sau pe margini) astfel încât oricare două puncte să se afle la distanță cel puțin $1$ unul față de celălalt?
+**Conway's Game of Life** nu este un joc în sensul obișnuit — nu există jucători, nu există decizii, nu există câștigători. Este un **automat celular**, inventat în 1970 de matematicianul britanic **John Horton Conway**, care a demonstrat ceva uluitor: din patru reguli elementare aplicate unei grile infinite de celule, poate emerge orice comportament computațional imaginabil.
 
-La prima vedere pare o problemă simplă. În realitate, răspunsul depinde de cum *aranjăm* punctele — iar alegerea configurației poate face diferența dintre câteva puncte în plus sau în minus.
-
----
-
-# Noțiuni de bază
-
-## 1. Distanța euclidiană
-
-Distanța dintre două puncte $A = (x_1, y_1)$ și $B = (x_2, y_2)$ în plan este: $$d(A, B) = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$$
-
-Condiția problemei este ca pentru orice pereche de puncte distincte $P_i, P_j$ din mulțimea noastră să avem: $$d(P_i, P_j) \geq 1$$
-
-## 2. Echivalența cu ambalarea discurilor
-
-Există o modalitate elegantă de a reformula problema: în jurul fiecărui punct plasăm un disc de rază $\frac{1}{2}$.
-
-Condiția $d(P_i, P_j) \geq 1$ este echivalentă cu faptul că discurile nu se suprapun (se pot atinge, dar nu se pot intersecta în interior). Astfel, maximizarea numărului de puncte este același lucru cu maximizarea numărului de discuri de rază $\frac{1}{2}$ care încap în pătrat.
-
-Această reformulare ne conectează la un domeniu bogat din matematică: **teoria ambalării** (*packing theory*).
+Întrebarea care a motivat invenția era filozofică: *cât de simple pot fi regulile unui sistem care generează complexitate arbitrară?* Răspunsul lui Conway a schimbat modul în care matematicienii și informaticienii gândesc despre viață, calcul și emergență.
 
 ---
 
-# Configurația 1 — Grila pătrată
+## Configurația inițială
 
-## Construcție
+Universul jocului este o **grilă bidimensională infinită** de celule, fiecare putând fi în una din două stări:
 
-Cea mai intuitivă soluție este să plasăm punctele pe o rețea cu pas $1$: $$P_{i,j} = (i,\ j), \quad i, j \in \{0, 1, 2, \ldots, \lfloor l \rfloor\}$$
+- **vie** (notată $1$ sau $\blacksquare$)
+- **moartă** (notată $0$ sau $\square$)
 
-unde $\lfloor l \rfloor$ este partea întreagă a lui $l$ (cel mai mare întreg mai mic sau egal cu $l$).
+O **configurație** (sau *pattern*) este o funcție $s : \mathbb{Z}^2 \to \{0, 1\}$ care asociază fiecărei celule $(i, j)$ starea sa la un moment dat. La fiecare pas de timp, toate celulele își actualizează simultan starea conform regulilor.
 
-## Numărul de puncte
+**Vecinătatea Moore** a unei celule $(i, j)$ este mulțimea celor 8 celule adiacente (orizontal, vertical și diagonal): $$\mathcal{N}(i, j) = \{(i+a,\ j+b) \mid a, b \in \{-1, 0, 1\},\ (a, b) \neq (0, 0)\}$$
 
-Pe fiecare linie și coloană avem $\lfloor l \rfloor + 1$ puncte, deci totalul este: $$N_{\text{grilă}} = (\lfloor l \rfloor + 1)^2$$
-
-## Verificarea condiției
-
-Distanța minimă între oricare doi vecini direcți (orizontal sau vertical) este exact $1$. Distanța diagonală este $\sqrt{2} > 1$. Condiția este îndeplinită.
+Numărul de vecini vii al celulei $(i, j)$ la pasul $t$ este: $$n_{i,j}^{(t)} = \sum_{(a,b) \in \mathcal{N}(i,j)} s_{a,b}^{(t)}$$
 
 ---
 
-# Configurația 2 — Grila hexagonală
+## Cele patru reguli
 
-## Motivație
+Starea la pasul $t+1$ depinde exclusiv de starea la pasul $t$ și de numărul de vecini vii:
 
-Grila pătrată lasă mult spațiu gol între puncte. Dacă privim discurile de rază $\frac{1}{2}$, există goluri în formă de romb între fiecare grup de patru discuri. Putem oare comprima rândurile?
+1. **Subpopulare:** o celulă vie cu mai puțin de 2 vecini vii **moare** (izolare).
+2. **Supraviețuire:** o celulă vie cu 2 sau 3 vecini vii **rămâne vie**.
+3. **Suprapopulare:** o celulă vie cu mai mult de 3 vecini vii **moare** (aglomerare).
+4. **Reproducere:** o celulă moartă cu exact 3 vecini vii **devine vie**.
 
-## Construcție
+Formal, funcția de tranziție $\phi : \{0,1\} \times \{0,\ldots,8\} \to \{0,1\}$ este: $$s_{i,j}^{(t+1)} = \phi\!\left(s_{i,j}^{(t)},\ n_{i,j}^{(t)}\right) = \begin{cases} 1 & \text{dacă } n_{i,j}^{(t)} = 3 \\\\ 1 & \text{dacă } s_{i,j}^{(t)} = 1 \text{ și } n_{i,j}^{(t)} = 2 \\\\ 0 & \text{altfel} \end{cases}$$
 
-Ideea este să intercalăm rândurile: rândul par rămâne la pozițiile întregi, iar rândul impar este decalat cu $\frac{1}{2}$ pe orizontală. Distanța verticală dintre rânduri devine $\frac{\sqrt{3}}{2} \approx 0{,}866$, mai mică decât $1$, ceea ce înseamnă că includem mai multe rânduri.
-
-Formal, rândul $k$ ($k = 0, 1, 2, \ldots$) are punctele: $$P_{k,j} = \left(j + \frac{k \bmod 2}{2},\ k \cdot \frac{\sqrt{3}}{2}\right), \quad j \in \mathbb{Z},\ 0 \leq P_{k,j}^{(x)} \leq l,\ 0 \leq k \cdot \frac{\sqrt{3}}{2} \leq l$$
-
-## Verificarea condiției
-
-Distanța dintre un punct și cei mai apropiați $6$ vecini ai săi (caracteristici rețelei hexagonale) este exact $1$. Condiția este satisfăcută.
-
-## Densitatea de ambalare
-
-Densitatea asimptotică a grilei hexagonale (raportul suprafață ocupată / suprafață totală) este: $$\delta_{\text{hex}} = \frac{\pi}{2\sqrt{3}} \approx 0{,}9069$$
-
-față de grila pătrată, care atinge: $$\delta_{\text{pătrat}} = \frac{\pi}{4} \approx 0{,}7854$$
-
-Grila hexagonală utilizează spațiul cu aproximativ **15%** mai eficient.
+Regulile sunt adesea notate compact ca **B3/S23** (Birth la 3 vecini, Survival la 2 sau 3 vecini) — o convenție folosită în clasificarea automatelor celulare.
 
 ---
 
-# Teorema lui Thue (1910)
+## Tipuri de configurații
 
-Axel Thue a demonstrat că nicio altă configurație nu poate depăși densitatea de ambalare a rețelei hexagonale în plan: $$\delta \leq \frac{\pi}{2\sqrt{3}}$$
+Comportamentul pe termen lung al unei configurații inițiale se clasifică în mai multe categorii.
 
-Cu alte cuvinte, grila hexagonală este **soluția optimă globală** pentru ambalarea discurilor egale în plan. Nu există un aranjament mai bun, indiferent cât de creativ ar fi.
+### Configurații statice (*Still Lifes*)
 
-Aceasta înseamnă că pentru pătrate cu latura $l$ mare, numărul maxim de puncte este aproximat de: $$N_{\text{max}} \approx \frac{2}{\sqrt{3}} \cdot l^2$$
+Nu se modifică de la un pas la altul: $s^{(t+1)} = s^{(t)}$. Sunt configurații în care fiecare celulă vie are exact 2 sau 3 vecini vii, iar fiecare celulă moartă adiacentă are mai puțin sau mai mult de 3 vecini vii.
 
-unde factorul $\frac{2}{\sqrt{3}} \approx 1{,}155$ reprezintă câștigul față de grila pătrată, care dă $\approx l^2$ puncte.
+Exemple clasice: **Block** (pătrat $2 \times 2$), **Beehive** (hexagon), **Loaf**, **Boat**. Cel mai mic *still life* are 4 celule.
 
----
+### Oscilatoare (*Oscillators*)
 
-# Cazuri particulare și subtilități
+Revin periodic la configurația inițială după $p$ pași, unde $p \geq 2$ se numește **perioadă**: $$s^{(t+p)} = s^{(t)}$$
 
-Pentru valori mici ale lui $l$, soluția optimă nu este neapărat grila hexagonală — efectele de margine contează mai mult. De exemplu:
+- **Blinker** — cel mai mic oscilator, $p = 2$: trei celule în linie alternează cu trei celule în coloană.
+- **Toad** — $p = 2$, 6 celule.
+- **Beacon** — $p = 2$, 8 celule.
+- **Pulsar** — $p = 3$, unul dintre cele mai frumoase pattern-uri.
+- **Pentadecathlon** — $p = 15$.
 
-- **$l = 1$:** maximul este $4$ puncte (cele $4$ colțuri ale pătratului).
-- **$l = \sqrt{2}$:** putem adăuga un al $5$-lea punct în centru, deoarece distanța de la centru la orice colț este exact $\frac{\sqrt{2}}{2} \cdot \sqrt{2} = 1$... dar atenție: depinde de cum definim pătratul.
-- **$l$ mare:** grila hexagonală câștigă clar față de grila pătrată.
+Au fost descoperite oscilatoare pentru orice perioadă $p \geq 2$.
 
-Aceste cazuri speciale sunt studiate în cadrul **problemelor de ambalare finită** (*finite packing problems*), un domeniu activ de cercetare.
+### Nave spațiale (*Spaceships*)
 
----
+Se deplasează pe grilă menținând forma (sau revenind la ea periodic după translatare). Viteza maximă posibilă este $c = 1\ \text{celulă/pas}$ (limita cosmică a universului Conway).
 
-# Aplicații practice
+- **Glider** — cel mai mic și mai cunoscut: $p = 4$, se deplasează diagonal cu viteza $\frac{c}{4}$.
+- **Lightweight Spaceship (LWSS)** — $p = 4$, viteza $\frac{c}{2}$ pe orizontală.
+- **Middleweight și Heavyweight Spaceships** — variante mai mari.
 
-Problema nu este doar teoretică. Configurațiile optime de puncte cu distanță minimă apar în:
+### Configurații în creștere
 
-- **Rețele de telecomunicații:** amplasarea antenelor astfel încât acoperirea să fie maximă fără interferențe.
-- **Cristalografie:** atomii în rețelele cristaline urmează exact aranjamentul hexagonal, minimizând energia potențială.
-- **Ambalare industrială:** câte obiecte circulare (țevi, cutii cilindrice) încap pe o suprafață dată.
-- **Grafică pe calculator:** eșantionarea *Poisson disk*, folosită la generarea de texturi și anti-aliasing, se bazează pe principiul distanței minime.
-- **Rețele de senzori IoT:** distribuția optimă a senzorilor într-o zonă monitorizată cu număr limitat de dispozitive.
+Unele configurații cresc indefinit, generând mereu celule noi.
 
----
-
-# Exemplu numeric
-
-Fie $l = 3$.
-
-**Grila pătrată:** plasăm puncte la $(i, j)$ cu $i, j \in \{0, 1, 2, 3\}$. Obținem: $$N_{\text{grilă}} = (3 + 1)^2 = 16 \text{ puncte}$$
-
-**Grila hexagonală:** distanța verticală dintre rânduri este $\frac{\sqrt{3}}{2} \approx 0{,}866$. Numărul de rânduri care încap în $[0, 3]$ este $\lfloor \frac{3}{0{,}866} \rfloor + 1 = 4 + 1 = 5$ rânduri.
-
-- Rândurile pare ($k = 0, 2, 4$): puncte la $x \in \{0, 1, 2, 3\}$ — câte $4$ puncte fiecare.
-- Rândurile impare ($k = 1, 3$): puncte la $x \in \{0{,}5,\ 1{,}5,\ 2{,}5\}$ — câte $3$ puncte fiecare.
-
-Total: $$N_{\text{hex}} = 3 \times 4 + 2 \times 3 = 12 + 6 = 18 \text{ puncte}$$
-
-Grila hexagonală adaugă **2 puncte în plus** față de grila pătrată pentru același pătrat.
+- **Glider Gun** (tunul lui Gosper, 1970) — produce câte un glider la fiecare 30 de generații; a fost primul pattern descoperit cu populație infinită. Conway oferise un premiu de 50 de dolari pentru descoperirea lui.
+- **Puffer Train** — se deplasează lăsând în urmă structuri stabile sau oscilatoare.
+- **Breeders** — cresc pătratic; produc multiple *guns* sau *puffers*.
 
 ---
 
-# Concluzie
+## Universalitate și calcul
 
-Problema împachetării punctelor în pătrat ilustrează cum o întrebare aparent simplă duce la matematică profundă. Grila pătrată oferă o soluție ușor de înțeles și de implementat, cu formula $(\lfloor l \rfloor + 1)^2$, dar grila hexagonală — demonstrată optimă de Thue — permite plasarea a circa $15\%$ mai multor puncte pentru pătrate mari.
+### Completitudine Turing
 
-Este un exemplu concret al modului în care geometria și combinatorica se întâlnesc cu informatica și ingineria, oferind soluții cu impact direct în lumea reală.
+Cel mai profund rezultat despre Game of Life: este **Turing-complet**. Orice calcul realizabil de o mașină Turing poate fi simulat într-o configurație inițială a jocului.
+
+Construcția folosește:
+- **Glider Gun** ca generator de semnal (fluxuri de glideri ca biți),
+- **Eater** ca absorber de semnal,
+- **Coliziuni de glideri** pentru implementarea porților logice AND, OR, NOT.
+
+Din aceste primitive se pot construi: registre, memorie, unitate aritmetică — deci un calculator complet.
+
+### Von Neumann universality
+
+În 2010, Andrew Wade a demonstrat că în Game of Life există configurații **auto-replicante** — pattern-uri care, după suficiente generații, produc copii exacte ale lor înșiși. Aceasta realizează programul lui von Neumann din anii 1940 despre auto-reproducerea mașinilor.
+
+### Nedecidabilitate
+
+Din completitudinea Turing decurg rezultate de nedecidabilitate directe:
+
+- **Problema vieții eterne** (*immortality problem*): nu există algoritm care să decidă, pentru o configurație finită arbitrară, dacă populația crește la infinit. Echivalentă cu problema opririi.
+- **Problema echivalenței**: nu se poate decide în general dacă două configurații duc la același comportament asimptotic.
+
+---
+
+## Proprietăți matematice
+
+### Reversibilitate
+
+Game of Life **nu este reversibil**: o configurație poate avea mai mulți predecesori sau niciun predecesor (*Garden of Eden*). Primele configurații *Garden of Eden* au fost demonstrate teoretic de Edward Moore în 1962 și construite explicit de Roger Banks și alții în 1971.
+
+Numărul de configurații fără predecesor este infinit.
+
+### Densitate și faza
+
+Comportamentul statistic al configurațiilor aleatoare depinde de **densitatea inițială** $\rho_0 = P(\text{celulă vie})$:
+
+- $\rho_0$ mic: populația moare rapid (prea puțini vecini).
+- $\rho_0$ mare: populația moare rapid (suprapopulare).
+- $\rho_0 \approx 0{,}37$: configurații cu viață prelungită, structuri emergente bogate.
+
+Există o **tranziție de fază** în jurul acestei densități critice, analog tranziției lichid-gaz din fizica statistică.
+
+### Entropie și compresie
+
+Configurațiile tipice după multe generații au **entropie informațională** mai mică decât configurații aleatorii de aceeași densitate — structurile emergente (oscilatoare, still lifes) sunt mai compresibile decât zgomotul pur.
+
+---
+
+## Conexiuni matematice și aplicații
+
+**Teoria automatelor celulare** — Game of Life este cel mai studiat automat celular 2D. John von Neumann proiectase anterior automatul celular cu 29 de stări și auto-replicare; Conway a arătat că 2 stări sunt suficiente.
+
+**Sisteme dinamice și haos** — Comportamentul multor configurații este impredictibil pe termen lung fără simulare explicită, analog sistemelor haotice. Sensibilitatea la condiții inițiale: modificarea unei singure celule poate schimba complet evoluția.
+
+**Biologie computațională** — Automatele celulare modelează creșterea tumorilor, propagarea semnalelor nervoase, formarea pattern-urilor pe blana animalelor (modelul Turing de morphogeneză).
+
+**Fizică** — Analogia cu mecanica statistică: celulele ca particule, regulile ca interacțiuni locale, pattern-urile emergente ca faze macroscopice.
+
+**Criptografie și generatoare pseudo-aleatoare** — Automatele celulare reversibile sunt folosite ca primitive criptografice datorită comportamentului lor haotic și eficienței computaționale.
+
+---
+
+## Patterns notabile și recorduri
+
+| Pattern | Tip | Perioadă / Viteză | Celule |
+|---------|-----|-------------------|--------|
+| Block | Still life | — | 4 |
+| Blinker | Oscilator | $p = 2$ | 3 |
+| Glider | Nava spațială | $c/4$ diagonal | 5 |
+| Gosper Glider Gun | Gun | $p = 30$ | 36 |
+| Pulsar | Oscilator | $p = 3$ | 48 |
+| LWSS | Nava spațială | $c/2$ orizontal | 9 |
+| Methuselah R-pentomino | Haotic | ~1100 gen. până stabilizare | 5 |
+
+**R-pentomino** merită o mențiune specială: 5 celule vii într-o configurație în formă de R evoluează haotic timp de 1103 generații înainte de a se stabiliza, producând 116 celule vii, 8 glideri și mai mulți oscilatoare. Un exemplu perfect al impredictibilității din simplitate.
+
+---
+
+## Notație și generalizări
+
+Game of Life este regula **B3/S23** dintr-o familie vastă de automate celulare cu același tip de grilă și vecinătate:
+
+- **HighLife (B36/S23)** — are auto-replicatori mai simpli decât Life.
+- **Seeds (B2/S)** — orice celulă vie moare imediat; creștere explozivă din semințe.
+- **Day & Night (B3678/S34678)** — simetric între viu și mort; comportament similar cu Life.
+- **Smooth Life** — generalizare continuă pe grilă reală, cu comportamente asemănătoare vieții biologice.
+
+Familia completă a automatelor celulare cu vecinătate Moore și 2 stări are $2^{2^9} = 2^{512}$ reguli posibile — un spațiu imens din care B3/S23 s-a dovedit cel mai bogat.
+
+---
+
+## Concluzie
+
+Conway's Game of Life demonstrează că **complexitatea nu necesită reguli complexe**. Patru reguli, două stări, o grilă infinită — și obții un univers Turing-complet, capabil de auto-replicare, calcul arbitrar și comportament impredictibil.
+
+Este un argument matematic pentru emergență: proprietăți globale sofisticate (calculabilitate, auto-organizare, structuri stabile) nu sunt prezente în reguli, ci apar din interacțiunile locale. Aceasta este, poate, și lecția cea mai profundă despre complexitatea din lumea reală.
+
+Puteți vedea mai jos o variantă interactivă a regulilor descrise, unde puteți desena configurații proprii și urmări evoluția lor pas cu pas.
