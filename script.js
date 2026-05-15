@@ -645,65 +645,98 @@ loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
   }
 
 
-  ///TABLE OF CONTENTS
+  ///TABLE OF CONTENTS  (robust, fara race conditions)
   var tocPanel = document.createElement('div');
   tocPanel.id = 'cbm-toc';
   document.body.appendChild(tocPanel);
-  var tocObserver = null;
+
+  var tocObserver  = null;
+  var tocHideTimer = null;   ///timer pentru stergerea innerHTML
+  var tocBuildTimer = null;  ///retry timer cand markdown nu e gata
+  var tocCurrentTheme = null; ///tema pentru care e construit TOC-ul
 
   function hideTOC () {
     tocPanel.classList.remove('cbm-toc-visible');
-    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
-    setTimeout(function () { tocPanel.innerHTML = ''; }, 300);
+    if (tocObserver)   { tocObserver.disconnect();  tocObserver  = null; }
+    clearTimeout(tocBuildTimer);
+    ///sterge innerHTML DOAR daca panoul e efectiv ascuns (nu suprascrie un build nou)
+    clearTimeout(tocHideTimer);
+    tocHideTimer = setTimeout(function () {
+      if (!tocPanel.classList.contains('cbm-toc-visible')) {
+        tocPanel.innerHTML = '';
+      }
+    }, 350);
+  }
+
+  function getHeadingText(h) {
+    var clone = h.cloneNode(true);
+    ///elimina MathML-ul ascuns al KaTeX (ca sa nu mai dubleze textul)
+    clone.querySelectorAll('.katex-mathml').forEach(function (el) { el.remove(); });
+    return clone.textContent.trim();
   }
 
   function buildTOC (themeEl) {
-    hideTOC();
-    var body = themeEl.querySelector('.theme-page-body');
-    if (!body) return;
-    var headings = body.querySelectorAll('h2, h3');
-    if (headings.length < 3) return;
+    ///daca e aceeasi tema si TOC-ul e deja vizibil, nu reface
+    if (themeEl === tocCurrentTheme && tocPanel.classList.contains('cbm-toc-visible')) return;
+    tocCurrentTheme = themeEl;
 
-    ///asignare id-uri
-    headings.forEach(function (h, i) {
-      if (!h.id) h.id = 'cbm-h-' + i;
-    });
+    ///anuleaza orice timer anterior
+    clearTimeout(tocHideTimer);
+    clearTimeout(tocBuildTimer);
+    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
 
-    tocPanel.innerHTML = '<span id="cbm-toc-label">Cuprins</span>';
-    var links = [];
+    function tryBuild () {
+      var body = themeEl.querySelector('.theme-page-body');
+      if (!body) return;
+      var headings = body.querySelectorAll('h2, h3');
 
-    headings.forEach(function (h) {
-      var a = document.createElement('a');
-      a.className = 'cbm-toc-link' + (h.tagName === 'H3' ? ' cbm-toc-h3' : '');
-      a.textContent = h.textContent.replace(/^#+\s*/, '');
-      a.addEventListener('click', function () {
-        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      ///daca markdown-ul nu e inca randat, mai asteptam
+      if (headings.length < 3) {
+        tocBuildTimer = setTimeout(tryBuild, 300);
+        return;
+      }
+
+      ///construieste panoul
+      tocPanel.innerHTML = '<span id="cbm-toc-label">Cuprins</span>';
+      var links = [];
+
+      headings.forEach(function (h, i) {
+        if (!h.id) h.id = 'cbm-h-' + i;
+        var a = document.createElement('a');
+        a.className = 'cbm-toc-link' + (h.tagName === 'H3' ? ' cbm-toc-h3' : '');
+        a.textContent = getHeadingText(h);
+        a.addEventListener('click', function () {
+          h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        tocPanel.appendChild(a);
+        links.push({ a: a, h: h });
       });
-      tocPanel.appendChild(a);
-      links.push({ a: a, h: h });
-    });
 
-    ///delay mic a.i. panel-ul nu e gol la inceput
-    requestAnimationFrame(function () {
-      tocPanel.classList.add('cbm-toc-visible');
-    });
-
-    ///highlight la heading activ
-    tocObserver = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          links.forEach(function (l) { l.a.classList.remove('cbm-toc-active'); });
-          var match = links.find(function (l) { return l.h === entry.target; });
-          if (match) match.a.classList.add('cbm-toc-active');
-        }
+      requestAnimationFrame(function () {
+        tocPanel.classList.add('cbm-toc-visible');
       });
-    }, { rootMargin: '-8% 0px -80% 0px', threshold: 0 });
 
-    headings.forEach(function (h) { tocObserver.observe(h); });
+      ///evidentiaza titlul curent pe scroll
+      tocObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            links.forEach(function (l) { l.a.classList.remove('cbm-toc-active'); });
+            var match = links.find(function (l) { return l.h === entry.target; });
+            if (match) match.a.classList.add('cbm-toc-active');
+          }
+        });
+      }, { rootMargin: '-8% 0px -80% 0px', threshold: 0 });
+
+      headings.forEach(function (h) { tocObserver.observe(h); });
+    }
+
+    tryBuild();
   }
 
 
   ///MutationObserver — prinde conținutul markdown când e randat
+  var mdDebounceTimer = null; ///debounce pt apeluri repetate
+
   var mdObserver = new MutationObserver(function (mutations) {
     mutations.forEach(function (m) {
       m.addedNodes.forEach(function (node) {
@@ -714,12 +747,15 @@ loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
           var themeEl = body.closest('.theme-page');
           if (themeEl && themeEl.classList.contains('active')) {
             addReadingTime(themeEl);
-            buildTOC(themeEl);
+            // Debounce: dacă markdown-ul e adăugat în mai multe noduri, nu reface TOC de fiecare dată
+            clearTimeout(mdDebounceTimer);
+            mdDebounceTimer = setTimeout(function () {
+              buildTOC(themeEl);
+            }, 200);
           }
         }
       });
     });
   });
   mdObserver.observe(document.body, { childList: true, subtree: true });
-
 })();
