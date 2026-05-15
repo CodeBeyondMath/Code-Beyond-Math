@@ -154,13 +154,22 @@ function loadMarkdown(file, elementId) {
     .then(r => r.text())
     .then(text => {
       const el = document.getElementById(elementId);
+      const mathStore = [];
+      const protect = (match) => {
+        const id = mathStore.length;
+        mathStore.push(match);
+        return `%%MATH_${id}%%`;
+      };
+      text = text.replace(/\$\$([\s\S]*?)\$\$/g, protect);
+      text = text.replace(/\$(?!\$)((?:[^$\\]|\\[\s\S])+?)\$(?!\$)/g, protect);
+      let html = marked.parse(text);
+      html = html.replace(/%%MATH_(\d+)%%/g, (_, i) => mathStore[+i]);
+      el.innerHTML = html;
 
-      el.innerHTML = marked.parse(text);
-      
       renderMathInElement(el, {
         delimiters: [
-          { left: "$$", right: "$$", display: true },
-          { left: "$", right: "$", display: false }
+          { left: "$$", right: "$$", display: true  },
+          { left: "$",  right: "$",  display: false }
         ],
         throwOnError: false
       });
@@ -201,7 +210,11 @@ loadMarkdown('md/tema4.md', 'theme4-body').then(() => {
   document.body.appendChild(s);
 });
 
-loadMarkdown('md/tema5.md', 'theme5-body');
+loadMarkdown('md/tema5.md', 'theme5-body').then(() => {
+  const s = document.createElement('script');
+  s.src = 'tema5-widget.js';
+  document.body.appendChild(s);
+});
 
 loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
   const s = document.createElement('script');
