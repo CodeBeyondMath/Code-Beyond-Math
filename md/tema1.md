@@ -1,4 +1,4 @@
-# Introducere
+## Introducere
 
 Criptarea prin matrice este o metodă care combină două idei simple:
 
@@ -10,11 +10,11 @@ Metoda este inspirată din criptografia clasică (precum cifra Hill), dar noi am
 
 ---
 
-# Cum pregătim textul pentru criptare
+## Cum pregătim textul pentru criptare
 
 Fie $T$ șirul de caractere introdus de utilizator.
 
-## 1. Conversia caracterelor în numere
+### 1. Conversia caracterelor în numere
 
 - Fiecare caracter este asociat cu codul său ASCII (intervalul $32\text{–}126$).
 - Apoi aplicăm o **permutare** introdusă de utilizator.
@@ -23,7 +23,7 @@ Fie $T$ șirul de caractere introdus de utilizator.
 
 Astfel, chiar dacă cineva ar vedea valorile numerice, nu ar putea determina direct caracterele originale.
 
-## 2. Formarea matricei $T$
+### 2. Formarea matricei $T$
 
 Textul este împărțit în grupuri de câte 3 caractere.  
 Dacă lungimea textului nu este multiplu de 3, completăm cu caractere neutre.
@@ -34,7 +34,7 @@ unde fiecare coloană reprezintă trei caractere consecutive din mesaj.
 
 ---
 
-# Matricea-cheie $K$
+## Matricea-cheie $K$
 
 Utilizatorul introduce o matrice: $$K \in M_{3 \times 3}(\mathbb{Z})$$
 
@@ -45,7 +45,7 @@ Fără această condiție, decriptarea ar putea introduce erori sau ar deveni im
 
 ---
 
-# Procesul de criptare
+## Procesul de criptare
 
 Criptarea constă într-o înmulțire de matrice: $$C = K \cdot T$$
 
@@ -59,7 +59,7 @@ Matricea $C$ este transmisă destinatarului.
 
 ---
 
-# Procesul de decriptare
+## Procesul de decriptare
 
 Pentru a recupera mesajul original, utilizatorul introduce:
 
@@ -67,7 +67,7 @@ Pentru a recupera mesajul original, utilizatorul introduce:
 - cheia $K$;
 - indicele permutării ASCII.
 
-## 1. Calculul inversei lui $K$
+### 1. Calculul inversei lui $K$
 
 Inversa matricei se calculează prin formula: $$K^{-1}=\frac{1}{\det(K)}\cdot\operatorname{adj}(K)$$ unde:
 
@@ -82,7 +82,7 @@ iar toate elementele lui $K^{-1}$ rămân întregi.
 
 ---
 
-## 2. Matricea adjunctă
+### 2. Matricea adjunctă
 
 Matricea adjunctă a unei matrice pătratice este transpusa matricei cofactorilor.
 
@@ -94,17 +94,15 @@ Această matrice este folosită în calculul inversei: $$K^{-1}=\frac{1}{\det(K)
 
 ---
 
-## 3. Recuperarea matricei $T$
+### 3. Recuperarea matricei $T$ și inversarea permutării ASCII
 
 Mesajul original este obținut prin: $$T = K^{-1} \cdot C$$
 
-## 4. Inversarea permutării ASCII
-
-Fiecare număr din matricea $T$ este transformat în caracterul original aplicând permutarea inversă.
+Apoi fiecare număr din matricea $T$ este transformat în caracterul original aplicând permutarea inversă.
 
 ---
 
-# Avantajele metodei
+## Avantajele metodei
 
 - **Securitate dublă:** matrice + permutare ASCII;
 - **Fără pierderi de informație:** determinantul $\pm1$ garantează decriptare exactă;
@@ -113,7 +111,7 @@ Fiecare număr din matricea $T$ este transformat în caracterul original aplicâ
 
 ---
 
-# Exemplu scurt (conceptual)
+## Exemplu scurt (conceptual)
 
 Presupunem că textul este „HELLO".
 
@@ -127,7 +125,7 @@ Puteți vedea mai jos o varianta interactivă a acestui exemplu
 
 ---
 
-# Concluzie
+## Concluzie
 
 Metoda combină noțiuni de algebră liniară cu programare, rezultând un sistem de criptare intuitiv, dar robust.  
 Este un exemplu practic al modului în care matematica poate fi aplicată direct în informatică și securitatea datelor.
