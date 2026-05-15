@@ -221,3 +221,105 @@ loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
   s.src = 'tema6-widget.js'
   document.body.appendChild(s);
 });
+
+///lightbox pt imagini din markdown (.md)
+(function () {
+  ///creeaza overlay-ul o singura data
+  const overlay = document.createElement('div');
+  overlay.id = 'lightbox-overlay';
+  Object.assign(overlay.style, {
+    display:         'none',
+    position:        'fixed',
+    inset:           '0',
+    background:      'rgba(0, 0, 0, 0.85)',
+    zIndex:          '9999',
+    cursor:          'zoom-out',
+    alignItems:      'center',
+    justifyContent:  'center',
+    backdropFilter:  'blur(4px)',
+    WebkitBackdropFilter: 'blur(4px)',
+    transition:      'opacity 0.25s ease',
+    opacity:         '0',
+  });
+
+  const img = document.createElement('img');
+  Object.assign(img.style, {
+    maxWidth:      '90vw',
+    maxHeight:     '90vh',
+    borderRadius:  '10px',
+    boxShadow:     '0 24px 80px rgba(0,0,0,0.6)',
+    transform:     'scale(0.92)',
+    transition:    'transform 0.25s ease',
+    pointerEvents: 'none',
+    userSelect:    'none',
+  });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  Object.assign(closeBtn.style, {
+    position:   'fixed',
+    top:        '20px',
+    right:      '24px',
+    background: 'none',
+    border:     'none',
+    color:      '#fff',
+    fontSize:   '1.6rem',
+    cursor:     'pointer',
+    lineHeight: '1',
+    opacity:    '0.7',
+    transition: 'opacity 0.15s',
+    zIndex:     '10000',
+  });
+  closeBtn.onmouseenter = () => closeBtn.style.opacity = '1';
+  closeBtn.onmouseleave = () => closeBtn.style.opacity = '0.7';
+
+  overlay.appendChild(img);
+  overlay.appendChild(closeBtn);
+  document.body.appendChild(overlay);
+
+  function openLightbox(src, alt) {
+    img.src = src;
+    img.alt = alt || '';
+    overlay.style.display = 'flex';
+    ///mica intarziere pt animatie
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+      img.style.transform   = 'scale(1)';
+    });
+  }
+
+  function closeLightbox() {
+    overlay.style.opacity = '0';
+    img.style.transform   = 'scale(0.92)';
+    setTimeout(() => { overlay.style.display = 'none'; }, 250);
+  }
+
+  overlay.addEventListener('click', closeLightbox);
+  closeBtn.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  ///"ascultă" click-uri pe imagini din markdown (delegare pe document)
+  document.addEventListener('click', function (e) {
+    const target = e.target;
+    if (
+      target.tagName === 'IMG' &&
+      target.closest('.markdown-body')
+    ) {
+      e.preventDefault();
+      openLightbox(target.src, target.alt);
+    }
+  });
+
+  ///aplica cursor pointer pe toate imaginile din markdown (inclusiv cele incarcate dinamic, via MutationObserver)
+  function styleMarkdownImages(root) {
+    root.querySelectorAll('.markdown-body img').forEach(el => {
+      el.style.cursor = 'zoom-in';
+    });
+  }
+
+  styleMarkdownImages(document);
+  new MutationObserver(() => styleMarkdownImages(document))
+    .observe(document.body, { childList: true, subtree: true });
+})();
