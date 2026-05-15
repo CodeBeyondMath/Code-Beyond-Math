@@ -17,9 +17,6 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked-katex-extension/lib/index.umd.js"></script>
 
-<!-- ============================================================
-     ADAUGIRI NOI – Mută blocul de mai jos în style.css
-     ============================================================ -->
 <style>
 /* ---------- Dropdown "Teme" din nav ---------- */
 .nav-dropdown {
@@ -67,14 +64,12 @@
   overflow: hidden;
   animation: dropdownFadeIn 0.2s ease;
 
-  /* Light mode (default) */
   background: #ffffff;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
   border: 1px solid rgba(0, 0, 0, 0.07);
   color: #1a1a1a;
 }
 
-/* Dark mode */
 [data-theme="dark"] .nav-dropdown-menu {
   background: #1e2227;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
@@ -101,7 +96,7 @@
   font-size: 0.92rem;
   transition: background 0.18s;
 
-  /* Light mode separator */
+  /* light mode separator */
   border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 }
 
@@ -114,7 +109,7 @@
 }
 
 .nav-dropdown-menu a:hover {
-  /* Light mode hover */
+  /* light mode hover */
   background: rgba(0, 0, 0, 0.05);
 }
 
@@ -131,23 +126,19 @@
 }
 
 /* ---------- Navigare mini-site ---------- */
-/* Ascunde toate theme-pages implicit */
 .theme-page {
   display: none;
 }
 
-/* Main view ascuns când e activ un mini-site */
 #main-view.hidden {
   display: none;
 }
 
-/* Mini-site activ */
 .theme-page.active {
   display: block;
-  min-height: calc(100vh - 60px); /* 60px = aproximativ înălțimea header-ului */
+  min-height: calc(100vh - 60px);
 }
 
-/* Buton înapoi în mini-site */
 .mini-back-btn {
   display: inline-flex;
   align-items: center;
@@ -178,9 +169,6 @@
   flex-shrink: 0;
 }
 </style>
-<!-- ============================================================
-     SFÂRŞIT bloc CSS nou
-     ============================================================ -->
 </head>
 <body>
 
@@ -190,7 +178,6 @@
     <nav class="main-nav">
       <a href="#about" onclick="showMain();">Despre</a>
 
-      <!-- ===== DROPDOWN TEME – NOU ===== -->
       <div class="nav-dropdown">
         <button
           class="nav-dropdown-btn"
@@ -222,7 +209,6 @@
           </a>
         </div>
       </div>
-      <!-- ===== SFÂRŞIT DROPDOWN ===== -->
 
     </nav>
     <button class="theme-toggle" id="themeToggle" aria-label="Comutare temă">
@@ -240,10 +226,6 @@
   </div>
 </header>
 
-<!-- ===================================================
-     MAIN VIEW: hero + despre + teme (grila)
-     Acesta este ecranul principal / meniu
-     =================================================== -->
 <div id="main-view">
 
   <section class="hero">
@@ -322,13 +304,7 @@
     </div>
   </section>
 
-</div><!-- /#main-view -->
-
-<!-- ===================================================
-     MINI-SITE-URI TEME
-     Fiecare secțiune apare ca o pagină separată
-     când e selectată din dropdown sau din grilă.
-     =================================================== -->
+</div>
 
 <section class="theme-page" id="theme1">
   <div class="container">
@@ -439,27 +415,22 @@
   <p>Code Beyond Math &copy; <span id="year"></span></p>
 </footer>
 
-<!-- ============================================================
-     ADAUGIRI NOI – Mută blocul de mai jos la SFÂRŞITUL script.js
-     (înainte de closing tag /body sau adaugă în script.js)
-     ============================================================ -->
 <script>
 (function () {
   /* ---- Navigare mini-site ---- */
-
   function showTheme(id) {
-    // Ascunde main view
+    ///ascunde main view
     document.getElementById('main-view').classList.add('hidden');
-    // Ascunde toate temele
+    ///ascunde toate temele
     document.querySelectorAll('.theme-page').forEach(function (el) {
       el.classList.remove('active');
     });
-    // Afișează tema dorită
+    ///afiseaza tema dorita
     var target = document.getElementById(id);
     if (target) target.classList.add('active');
-    // Scroll la vârf
+    ///scroll la varf
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Închide dropdown-ul
+    ///inchide dropdown-ul
     closeDropdown();
   }
 
@@ -472,7 +443,7 @@
     closeDropdown();
   }
 
-  // Expunem global pentru onclick-urile din HTML
+  ///expunem global pt onclick-urile din HTML
   window.showTheme = showTheme;
   window.showMain  = showMain;
 
@@ -500,22 +471,18 @@
     }
   });
 
-  // Închide dropdown la click în afara lui
+  ///inchide dropdown la click in afara lui
   document.addEventListener('click', function (e) {
     if (!dropdownMenu.contains(e.target) && e.target !== dropdownBtn) {
       closeDropdown();
     }
   });
 
-  // Închide dropdown la Escape
+  ///inchide dropdown la esc
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeDropdown();
   });
 })();
 </script>
-<!-- ============================================================
-     SFÂRŞIT bloc JS nou
-     ============================================================ -->
-
 </body>
 </html>
