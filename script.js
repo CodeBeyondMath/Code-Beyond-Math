@@ -181,11 +181,12 @@ loadMarkdown('md/tema1.md', 'theme1-body').then(() => {
 loadMarkdown('md/tema2.md', 'theme2-body').then(() => {
   const sp = document.createElement('script');
   sp.src = 'tema2-calc-widget.js';
+  sp.onload = () => {
+    const s = document.createElement('script');
+    s.src = 'tema2-widget.js';
+    document.body.appendChild(s);
+  };
   document.body.appendChild(sp);
-
-  const s = document.createElement('script');
-  s.src = 'tema2-widget.js';
-  document.body.appendChild(s);
 });
 
 loadMarkdown('md/tema3.md', 'theme3-body').then(() => {
@@ -204,6 +205,6 @@ loadMarkdown('md/tema5.md', 'theme5-body');
 
 loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
   const s = document.createElement('script');
-  s.src = 'tema6-widget.js';
+  s.src = 'tema6-widget.js'
   document.body.appendChild(s);
 });
