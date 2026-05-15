@@ -323,3 +323,403 @@ loadMarkdown('md/tema6.md', 'theme6-body').then(() => {
   new MutationObserver(() => styleMarkdownImages(document))
     .observe(document.body, { childList: true, subtree: true });
 })();
+
+(function () {
+  'use strict';
+
+  const s = document.createElement('style');
+  s.textContent = `
+
+/* ── 1. Progress bar ── */
+#cbm-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #6c63ff, #a78bfa, #6c63ff);
+  background-size: 200% 100%;
+  animation: progressShimmer 2s linear infinite;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s, width 0.08s linear;
+  border-radius: 0 2px 2px 0;
+  pointer-events: none;
+}
+#cbm-progress.visible { opacity: 1; }
+@keyframes progressShimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── 2. Scroll reveal ── */
+.cbm-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.cbm-reveal.cbm-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.cbm-delay-1 { transition-delay: 0.05s; }
+.cbm-delay-2 { transition-delay: 0.12s; }
+.cbm-delay-3 { transition-delay: 0.19s; }
+.cbm-delay-4 { transition-delay: 0.26s; }
+.cbm-delay-5 { transition-delay: 0.33s; }
+.cbm-delay-6 { transition-delay: 0.40s; }
+
+/* ── 3. Reading time badge ── */
+.cbm-reading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  border-radius: 20px;
+  padding: 4px 12px;
+  margin-top: 10px;
+  color: #4a6fa5;
+  background: rgba(74, 111, 165, 0.08);
+  border: 1px solid rgba(74, 111, 165, 0.18);
+}
+[data-theme="dark"] .cbm-reading-badge {
+  color: #a0b4d8;
+  background: rgba(160, 180, 216, 0.08);
+  border-color: rgba(160, 180, 216, 0.18);
+}
+
+/* ── 4. Page transitions ── */
+@keyframes cbmFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes cbmFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+.cbm-fade-in  { animation: cbmFadeIn  0.3s ease forwards; }
+.cbm-fade-out { animation: cbmFadeOut 0.2s ease forwards; }
+
+/* ── 5. Copy code button ── */
+.cbm-code-wrap {
+  position: relative;
+}
+.cbm-copy-btn {
+  position: absolute;
+  top: 10px; right: 10px;
+  padding: 4px 11px;
+  font-size: 0.72rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07);
+  color: #c8d4e8;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, border-color 0.2s, color 0.2s;
+  z-index: 3;
+  letter-spacing: 0.02em;
+}
+.cbm-code-wrap:hover .cbm-copy-btn { opacity: 1; }
+.cbm-copy-btn:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.35);
+}
+.cbm-copy-btn.cbm-copied {
+  opacity: 1;
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.5);
+  background: rgba(74, 222, 128, 0.08);
+}
+
+/* ── 6. Table of Contents ── */
+#cbm-toc {
+  position: fixed;
+  top: 50%;
+  right: 28px;
+  transform: translateY(-50%);
+  width: 190px;
+  max-height: 68vh;
+  overflow-y: auto;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  scrollbar-width: none;
+}
+#cbm-toc::-webkit-scrollbar { display: none; }
+#cbm-toc.cbm-toc-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#cbm-toc-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4a6fa5;
+  margin: 0 0 10px 12px;
+  display: block;
+}
+[data-theme="dark"] #cbm-toc-label { color: #a0b4d8; }
+.cbm-toc-link {
+  display: block;
+  font-size: 0.74rem;
+  color: #888;
+  text-decoration: none;
+  padding: 4px 8px 4px 12px;
+  border-left: 2px solid transparent;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s, padding-left 0.18s;
+  border-radius: 0 4px 4px 0;
+}
+.cbm-toc-link:hover { color: #6c63ff; }
+[data-theme="dark"] .cbm-toc-link:hover { color: #a78bfa; }
+.cbm-toc-link.cbm-toc-active {
+  color: #6c63ff;
+  border-left-color: #6c63ff;
+  font-weight: 600;
+}
+[data-theme="dark"] .cbm-toc-link.cbm-toc-active {
+  color: #e8c84a;
+  border-left-color: #e8c84a;
+}
+.cbm-toc-h3 {
+  padding-left: 22px;
+  font-size: 0.69rem;
+}
+@media (max-width: 1120px) { #cbm-toc { display: none !important; } }
+
+`;
+  document.head.appendChild(s);
+
+
+  ///PROGRESS BAR
+  const progressBar = document.createElement('div');
+  progressBar.id = 'cbm-progress';
+  document.body.prepend(progressBar);
+
+  function updateProgress () {
+    const active = document.querySelector('.theme-page.active');
+    if (!active) { progressBar.classList.remove('visible'); progressBar.style.width = '0%'; return; }
+    progressBar.classList.add('visible');
+    const total = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+
+  ///SCROLL REVEAL
+  function initReveal () {
+    document.querySelectorAll('.theme-card').forEach(function (el, i) {
+      if (el.classList.contains('cbm-reveal')) return;
+      el.classList.add('cbm-reveal', 'cbm-delay-' + (i % 6 + 1));
+    });
+    document.querySelectorAll('.about-inner > *').forEach(function (el, i) {
+      if (el.classList.contains('cbm-reveal')) return;
+      el.classList.add('cbm-reveal', 'cbm-delay-' + Math.min(i + 1, 6));
+    });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('cbm-revealed'); obs.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.cbm-reveal').forEach(function (el) { obs.observe(el); });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initReveal);
+  } else {
+    initReveal();
+  }
+
+
+  ///READING TIME
+  function addReadingTime (themeEl) {
+    var header = themeEl.querySelector('.theme-page-header');
+    var body   = themeEl.querySelector('.theme-page-body');
+    if (!header || !body || header.querySelector('.cbm-reading-badge')) return;
+    var words = (body.innerText || body.textContent || '').trim().split(/\s+/).length;
+    var mins  = Math.max(1, Math.round(words / 200));
+    var badge = document.createElement('div');
+    badge.className = 'cbm-reading-badge';
+    badge.innerHTML =
+      '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">' +
+        '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>' +
+      '</svg>' +
+      '&nbsp;~' + mins + ' min citire';
+    header.appendChild(badge);
+  }
+
+
+  ///PAGE TRANSITIONS  (patch showTheme / showMain)
+  var _origShowTheme = window.showTheme;
+  var _origShowMain  = window.showMain;
+
+  function fadeIn (el) {
+    el.classList.remove('cbm-fade-in');
+    void el.offsetWidth; // reflow
+    el.classList.add('cbm-fade-in');
+    el.addEventListener('animationend', function h () {
+      el.removeEventListener('animationend', h);
+      el.classList.remove('cbm-fade-in');
+    });
+  }
+
+  function fadeOutThen (el, cb) {
+    el.classList.remove('cbm-fade-out');
+    void el.offsetWidth;
+    el.classList.add('cbm-fade-out');
+    el.addEventListener('animationend', function h () {
+      el.removeEventListener('animationend', h);
+      el.classList.remove('cbm-fade-out');
+      cb();
+    });
+  }
+
+  window.showTheme = function (id) {
+    var current = document.querySelector('.theme-page.active') || document.getElementById('main-view');
+    var proceed = function () {
+      _origShowTheme(id);
+      var next = document.getElementById(id);
+      if (next) { fadeIn(next); }
+      updateProgress();
+      ///reading time + TOC dupa renderul de markdown
+      setTimeout(function () {
+        if (next) { addReadingTime(next); buildTOC(next); addCopyButtons(next); }
+      }, 350);
+    };
+    if (current && !current.classList.contains('hidden') &&
+        !(current.id === 'main-view' && current.classList.contains('hidden'))) {
+      fadeOutThen(current, proceed);
+    } else {
+      proceed();
+    }
+  };
+
+  window.showMain = function () {
+    var current = document.querySelector('.theme-page.active');
+    hideTOC();
+    var proceed = function () {
+      _origShowMain();
+      var mv = document.getElementById('main-view');
+      if (mv) fadeIn(mv);
+      updateProgress();
+    };
+    if (current) { fadeOutThen(current, proceed); } else { proceed(); }
+  };
+
+
+  ///COPY CODE BTN
+  function addCopyButtons (container) {
+    container.querySelectorAll('pre').forEach(function (pre) {
+      if (pre.parentElement && pre.parentElement.classList.contains('cbm-code-wrap')) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'cbm-code-wrap';
+      pre.parentNode.insertBefore(wrap, pre);
+      wrap.appendChild(pre);
+
+      var btn = document.createElement('button');
+      btn.className = 'cbm-copy-btn';
+      btn.textContent = 'Copiază';
+      wrap.appendChild(btn);
+
+      btn.addEventListener('click', function () {
+        var code = pre.querySelector('code') || pre;
+        var text = code.innerText || code.textContent || '';
+        navigator.clipboard.writeText(text).then(function () {
+          btn.textContent = '✓ Copiat!';
+          btn.classList.add('cbm-copied');
+          setTimeout(function () {
+            btn.textContent = 'Copiază';
+            btn.classList.remove('cbm-copied');
+          }, 2200);
+        }).catch(function () {
+          btn.textContent = 'Eroare';
+          setTimeout(function () { btn.textContent = 'Copiază'; }, 1500);
+        });
+      });
+    });
+  }
+
+
+  ///TABLE OF CONTENTS
+  var tocPanel = document.createElement('div');
+  tocPanel.id = 'cbm-toc';
+  document.body.appendChild(tocPanel);
+  var tocObserver = null;
+
+  function hideTOC () {
+    tocPanel.classList.remove('cbm-toc-visible');
+    if (tocObserver) { tocObserver.disconnect(); tocObserver = null; }
+    setTimeout(function () { tocPanel.innerHTML = ''; }, 300);
+  }
+
+  function buildTOC (themeEl) {
+    hideTOC();
+    var body = themeEl.querySelector('.theme-page-body');
+    if (!body) return;
+    var headings = body.querySelectorAll('h2, h3');
+    if (headings.length < 3) return;
+
+    ///asignare id-uri
+    headings.forEach(function (h, i) {
+      if (!h.id) h.id = 'cbm-h-' + i;
+    });
+
+    tocPanel.innerHTML = '<span id="cbm-toc-label">Cuprins</span>';
+    var links = [];
+
+    headings.forEach(function (h) {
+      var a = document.createElement('a');
+      a.className = 'cbm-toc-link' + (h.tagName === 'H3' ? ' cbm-toc-h3' : '');
+      a.textContent = h.textContent.replace(/^#+\s*/, '');
+      a.addEventListener('click', function () {
+        h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      tocPanel.appendChild(a);
+      links.push({ a: a, h: h });
+    });
+
+    ///delay mic a.i. panel-ul nu e gol la inceput
+    requestAnimationFrame(function () {
+      tocPanel.classList.add('cbm-toc-visible');
+    });
+
+    ///highlight la heading activ
+    tocObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          links.forEach(function (l) { l.a.classList.remove('cbm-toc-active'); });
+          var match = links.find(function (l) { return l.h === entry.target; });
+          if (match) match.a.classList.add('cbm-toc-active');
+        }
+      });
+    }, { rootMargin: '-8% 0px -80% 0px', threshold: 0 });
+
+    headings.forEach(function (h) { tocObserver.observe(h); });
+  }
+
+
+  ///MutationObserver — prinde conținutul markdown când e randat
+  var mdObserver = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      m.addedNodes.forEach(function (node) {
+        if (node.nodeType !== 1) return;
+        var body = node.closest ? node.closest('.theme-page-body') : null;
+        if (body) {
+          addCopyButtons(body);
+          var themeEl = body.closest('.theme-page');
+          if (themeEl && themeEl.classList.contains('active')) {
+            addReadingTime(themeEl);
+            buildTOC(themeEl);
+          }
+        }
+      });
+    });
+  });
+  mdObserver.observe(document.body, { childList: true, subtree: true });
+
+})();
