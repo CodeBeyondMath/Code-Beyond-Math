@@ -1,105 +1,178 @@
-## Ce este un arbore de acoperire?
+## Introducere
 
-Imaginează-ți o rețea de orașe legate prin drumuri. Un **arbore de acoperire** este o mulțime minimă de drumuri care conectează *toate* orașele, fără să formeze niciun circuit. Dacă ai $n$ orașe, ai nevoie de exact $n - 1$ drumuri.
+**Conway's Game of Life** nu este un joc în sensul obișnuit — nu există jucători, nu există decizii, nu există câștigători. Este un **automat celular**, inventat în 1970 de matematicianul britanic **John Horton Conway**, care a demonstrat ceva uluitor: din patru reguli elementare aplicate unei grile infinite de celule, poate emerge orice comportament computațional imaginabil.
 
-**De ce contează?** Proiectanții de rețele de calculatoare, inginerii electrici și algoritmii de transport rezolvă în mod constant problema: *în câte moduri pot conecta toate nodurile cu cost minim, fără redundanță?* Numărul arborilor de acoperire măsoară exact această diversitate.
-
----
-
-## Grafuri și arbori — vocabularul esențial
-
-Un **graf neorientat** $G = (V, E)$ are o mulțime de **noduri** $V$ și o mulțime de **muchii** $E$ — perechi neordonate de noduri.
-
-Un **arbore de acoperire** al lui $G$ este un subgraf care:
-- conține **toate** nodurile din $V$
-- are exact $|V| - 1$ muchii
-- este **conex** (există drum între orice două noduri)
-- nu conține **niciun ciclu**
-
-Aceste patru condiții sunt echivalente două câte două: orice subgraf conex cu $n - 1$ muchii e automat arbore, și invers.
-
-**Exemplu simplu.** Graful complet $K_3$ (triunghi cu nodurile 1, 2, 3):
-
-```
-  1
- / \
-2 — 3
-```
-
-Are 3 arbori de acoperire: $\{1\text{-}2,\ 1\text{-}3\}$, $\{1\text{-}2,\ 2\text{-}3\}$, $\{1\text{-}3,\ 2\text{-}3\}$. Fiecare lasă în afară exact o muchie.
+Întrebarea care a motivat invenția era filozofică: *cât de simple pot fi regulile unui sistem care generează complexitate arbitrară?* Răspunsul lui Conway a schimbat modul în care matematicienii și informaticienii gândesc despre viață, calcul și emergență.
 
 ---
 
-## Matricea Laplaciană
+## Configurația inițială
 
-Acesta este instrumentul algebraic central al teoremei. Pentru un graf cu $n$ noduri, definim matricea **Laplaciană** $L$ de dimensiune $n \times n$ astfel: $$L[i][i] = \deg(i), \quad L[i][j] = -1 \text{ dacă } \{i,j\} \in E, \quad L[i][j] = 0 \text{ altfel}$$
+Universul jocului este o **grilă bidimensională infinită** de celule, fiecare putând fi în una din două stări:
 
-Cu alte cuvinte: $L = D - A$, unde $D$ este matricea diagonală a gradelor și $A$ este matricea de adiacență.
+- **vie** (notată $1$ sau $\blacksquare$)
+- **moartă** (notată $0$ sau $\square$)
 
-**Proprietăți cheie ale lui $L$:**
-- Suma fiecărei linii (și coloane) este zero, deci $\det(L) = 0$ întotdeauna
-- $L$ este **pozitiv semidefinit**: toate valorile proprii sunt $\geq 0$
-- Rangul lui $L$ este $n - 1$ dacă și numai dacă graful este **conex**
-- Există exact o valoare proprie egală cu $0$ (pentru grafuri conexe)
+O **configurație** (sau *pattern*) este o funcție $s : \mathbb{Z}^2 \to \{0, 1\}$ care asociază fiecărei celule $(i, j)$ starea sa la un moment dat. La fiecare pas de timp, toate celulele își actualizează simultan starea conform regulilor.
 
-**Exemplu pentru $K_3$:**
+**Vecinătatea Moore** a unei celule $(i, j)$ este mulțimea celor 8 celule adiacente (orizontal, vertical și diagonal): $$\mathcal{N}(i, j) = \{(i+a,\ j+b) \mid a, b \in \{-1, 0, 1\},\ (a, b) \neq (0, 0)\}$$
 
-$$L = \begin{pmatrix} 2 & -1 & -1 \\\\ -1 & 2 & -1 \\\\ -1 & -1 & 2 \end{pmatrix}$$
-
-Nodul 1 are grad 2 (legat de 2 și 3), deci $L[1][1] = 2$, $L[1][2] = L[1][3] = -1$.
+Numărul de vecini vii al celulei $(i, j)$ la pasul $t$ este: $$n_{i,j}^{(t)} = \sum_{(a,b) \in \mathcal{N}(i,j)} s_{a,b}^{(t)}$$
 
 ---
 
-## Teorema lui Kirchhoff (Matrix-Tree Theorem)
+## Cele patru reguli
 
-> **Teoremă (Kirchhoff, 1847).** Numărul arborilor de acoperire ai unui graf neorientat conex cu $n$ noduri este egal cu **orice cofactor** al matricei sale laplaciene.
->
-> Cofactorul $C_{ij} = (-1)^{i+j} \cdot \det(\tilde{L}_{ij})$, unde $\tilde{L}_{ij}$ este matricea obținută ștergând linia $i$ și coloana $j$.
->
-> **Remarcabil:** toți cofactorii sunt egali — nu contează ce linie și coloană elimini.
+Starea la pasul $t+1$ depinde exclusiv de starea la pasul $t$ și de numărul de vecini vii:
 
-### De ce funcționează — ideea demonstrației
+1. **Subpopulare:** o celulă vie cu mai puțin de 2 vecini vii **moare** (izolare).
+2. **Supraviețuire:** o celulă vie cu 2 sau 3 vecini vii **rămâne vie**.
+3. **Suprapopulare:** o celulă vie cu mai mult de 3 vecini vii **moare** (aglomerare).
+4. **Reproducere:** o celulă moartă cu exact 3 vecini vii **devine vie**.
 
-**Pasul 1 — Factorizarea $L = B \cdot B^T$.** Orientăm arbitrar fiecare muchie și construim **matricea de incidență orientată** $B$ de dimensiune $n \times m$: $B[i][k] = +1$ dacă muchia $k$ pleacă din $i$, $-1$ dacă sosește, $0$ altfel. Se verifică direct că $B \cdot B^T = L$.
+Formal, funcția de tranziție $\phi : \{0,1\} \times \{0,\ldots,8\} \to \{0,1\}$ este: $$s_{i,j}^{(t+1)} = \phi\!\left(s_{i,j}^{(t)},\ n_{i,j}^{(t)}\right) = \begin{cases} 1 & \text{dacă } n_{i,j}^{(t)} = 3 \\\\ 1 & \text{dacă } s_{i,j}^{(t)} = 1 \text{ și } n_{i,j}^{(t)} = 2 \\\\ 0 & \text{altfel} \end{cases}$$
 
-**Pasul 2 — Formula Cauchy-Binet.** Fie $\tilde{L}$ cofactorul obținut ștergând ultima linie și coloană, și $\tilde{B}$ matricea $B$ fără ultima linie. Atunci: $$\det(\tilde{L}) = \det(\tilde{B} \cdot \tilde{B}^T) = \sum_{S} \det(\tilde{B}_S)^2$$
-
-unde suma rulează peste toate submulțimile $S$ de $n - 1$ coloane ale lui $\tilde{B}$.
-
-**Pasul 3 — Interpretarea combinatorică.** Un subset $S$ de $n - 1$ muchii formează un **arbore de acoperire** dacă și numai dacă $\det(\tilde{B}_S) = \pm 1$. Dacă $S$ conține un ciclu, liniile sunt dependente și determinantul este $0$. Deci: $$\det(\tilde{L}) = \sum_{S \text{ arbore}} 1 = \tau(G)$$
-
-**Pasul 4 — Invarianța cofactorului.** Deoarece orice linie a lui $L$ se poate elimina, toți cofactorii diagonali sunt egali cu $\tau(G)$. Prin matricea adjunctă se arată că și cofactorii ne-diagonali sunt egali.
-
-### Verificare pe $K_3$
-
-Ștergem linia 3 și coloana 3:
-
-$$\tilde{L}_{33} = \begin{pmatrix} 2 & -1 \\\\ -1 & 2 \end{pmatrix}$$
-
-$$\det(\tilde{L}_{33}) = 2 \cdot 2 - (-1) \cdot (-1) = 4 - 1 = 3 \checkmark$$
-
-Exact cei 3 arbori pe care i-am numărat vizual!
-
-### Formula prin valori proprii (bonus)
-
-Dacă $\lambda_1 \leq \lambda_2 \leq \cdots \leq \lambda_n$ sunt valorile proprii ale lui $L$, cu $\lambda_1 = 0$, atunci: $$\tau(G) = \frac{1}{n} \cdot \lambda_2 \cdot \lambda_3 \cdots \lambda_n$$
-
-Pentru $K_4$: valorile proprii sunt $0, 4, 4, 4$, deci $\tau(K_4) = \frac{1}{4} \cdot 4 \cdot 4 \cdot 4 = 16$.
+Regulile sunt adesea notate compact ca **B3/S23** (Birth la 3 vecini, Survival la 2 sau 3 vecini) — o convenție folosită în clasificarea automatelor celulare.
 
 ---
 
-## Rezultate notabile
+## Tipuri de configurații
 
-| Graf | Noduri | Arbori de acoperire |
-|------|--------|---------------------|
-| $K_n$ (complet) | $n$ | $n^{n-2}$ (formula Cayley) |
-| $C_n$ (ciclu) | $n$ | $n$ |
-| $P_n$ (lanț) | $n$ | $1$ |
-| $K_{3,3}$ (bipartit complet) | $6$ | $81$ |
-| Hipercub $Q_3$ | $8$ | $384$ |
+Comportamentul pe termen lung al unei configurații inițiale se clasifică în mai multe categorii.
 
-**Formula lui Cayley** ($\tau(K_n) = n^{n-2}$) este un caz special elegant: graful complet pe $n$ noduri are exact $n^{n-2}$ arbori de acoperire. Pentru $n = 4$: $4^2 = 16$. Se poate demonstra și combinatoric (prin coduri Prüfer), dar teorema lui Kirchhoff o dă *gratuit* din calculul valorilor proprii.
+### Configurații statice (*Still Lifes*)
+
+Nu se modifică de la un pas la altul: $s^{(t+1)} = s^{(t)}$. Sunt configurații în care fiecare celulă vie are exact 2 sau 3 vecini vii, iar fiecare celulă moartă adiacentă are mai puțin sau mai mult de 3 vecini vii.
+
+Exemple clasice: **Block** (pătrat $2 \times 2$), **Beehive** (hexagon), **Loaf**, **Boat**. Cel mai mic *still life* are 4 celule.
+
+### Oscilatoare (*Oscillators*)
+
+Revin periodic la configurația inițială după $p$ pași, unde $p \geq 2$ se numește **perioadă**: $$s^{(t+p)} = s^{(t)}$$
+
+- **Blinker** — cel mai mic oscilator, $p = 2$: trei celule în linie alternează cu trei celule în coloană.
+- **Toad** — $p = 2$, 6 celule.
+- **Beacon** — $p = 2$, 8 celule.
+- **Pulsar** — $p = 3$, unul dintre cele mai frumoase pattern-uri.
+- **Pentadecathlon** — $p = 15$.
+
+Au fost descoperite oscilatoare pentru orice perioadă $p \geq 2$.
+
+### Nave spațiale (*Spaceships*)
+
+Se deplasează pe grilă menținând forma (sau revenind la ea periodic după translatare). Viteza maximă posibilă este $c = 1\ \text{celulă/pas}$ (limita cosmică a universului Conway).
+
+- **Glider** — cel mai mic și mai cunoscut: $p = 4$, se deplasează diagonal cu viteza $\frac{c}{4}$.
+- **Lightweight Spaceship (LWSS)** — $p = 4$, viteza $\frac{c}{2}$ pe orizontală.
+- **Middleweight și Heavyweight Spaceships** — variante mai mari.
+
+### Configurații în creștere
+
+Unele configurații cresc indefinit, generând mereu celule noi.
+
+- **Glider Gun** (tunul lui Gosper, 1970) — produce câte un glider la fiecare 30 de generații; a fost primul pattern descoperit cu populație infinită. Conway oferise un premiu de 50 de dolari pentru descoperirea lui.
+- **Puffer Train** — se deplasează lăsând în urmă structuri stabile sau oscilatoare.
+- **Breeders** — cresc pătratic; produc multiple *guns* sau *puffers*.
 
 ---
 
-*Folosește demo-ul interactiv de mai jos pentru a construi propriul graf și a vedea teoria în acțiune.*
+## Universalitate și calcul
+
+### Completitudine Turing
+
+Cel mai profund rezultat despre Game of Life: este **Turing-complet**. Orice calcul realizabil de o mașină Turing poate fi simulat într-o configurație inițială a jocului.
+
+Construcția folosește:
+- **Glider Gun** ca generator de semnal (fluxuri de glideri ca biți),
+- **Eater** ca absorber de semnal,
+- **Coliziuni de glideri** pentru implementarea porților logice AND, OR, NOT.
+
+Din aceste primitive se pot construi: registre, memorie, unitate aritmetică — deci un calculator complet.
+
+### Von Neumann universality
+
+În 2010, Andrew Wade a demonstrat că în Game of Life există configurații **auto-replicante** — pattern-uri care, după suficiente generații, produc copii exacte ale lor înșiși. Aceasta realizează programul lui von Neumann din anii 1940 despre auto-reproducerea mașinilor.
+
+### Nedecidabilitate
+
+Din completitudinea Turing decurg rezultate de nedecidabilitate directe:
+
+- **Problema vieții eterne** (*immortality problem*): nu există algoritm care să decidă, pentru o configurație finită arbitrară, dacă populația crește la infinit. Echivalentă cu problema opririi.
+- **Problema echivalenței**: nu se poate decide în general dacă două configurații duc la același comportament asimptotic.
+
+---
+
+## Proprietăți matematice
+
+### Reversibilitate
+
+Game of Life **nu este reversibil**: o configurație poate avea mai mulți predecesori sau niciun predecesor (*Garden of Eden*). Primele configurații *Garden of Eden* au fost demonstrate teoretic de Edward Moore în 1962 și construite explicit de Roger Banks și alții în 1971.
+
+Numărul de configurații fără predecesor este infinit.
+
+### Densitate și faza
+
+Comportamentul statistic al configurațiilor aleatoare depinde de **densitatea inițială** $\rho_0 = P(\text{celulă vie})$:
+
+- $\rho_0$ mic: populația moare rapid (prea puțini vecini).
+- $\rho_0$ mare: populația moare rapid (suprapopulare).
+- $\rho_0 \approx 0{,}37$: configurații cu viață prelungită, structuri emergente bogate.
+
+Există o **tranziție de fază** în jurul acestei densități critice, analog tranziției lichid-gaz din fizica statistică.
+
+### Entropie și compresie
+
+Configurațiile tipice după multe generații au **entropie informațională** mai mică decât configurații aleatorii de aceeași densitate — structurile emergente (oscilatoare, still lifes) sunt mai compresibile decât zgomotul pur.
+
+---
+
+## Conexiuni matematice și aplicații
+
+**Teoria automatelor celulare** — Game of Life este cel mai studiat automat celular 2D. John von Neumann proiectase anterior automatul celular cu 29 de stări și auto-replicare; Conway a arătat că 2 stări sunt suficiente.
+
+**Sisteme dinamice și haos** — Comportamentul multor configurații este impredictibil pe termen lung fără simulare explicită, analog sistemelor haotice. Sensibilitatea la condiții inițiale: modificarea unei singure celule poate schimba complet evoluția.
+
+**Biologie computațională** — Automatele celulare modelează creșterea tumorilor, propagarea semnalelor nervoase, formarea pattern-urilor pe blana animalelor (modelul Turing de morphogeneză).
+
+**Fizică** — Analogia cu mecanica statistică: celulele ca particule, regulile ca interacțiuni locale, pattern-urile emergente ca faze macroscopice.
+
+**Criptografie și generatoare pseudo-aleatoare** — Automatele celulare reversibile sunt folosite ca primitive criptografice datorită comportamentului lor haotic și eficienței computaționale.
+
+---
+
+## Patterns notabile și recorduri
+
+| Pattern | Tip | Perioadă / Viteză | Celule |
+|---------|-----|-------------------|--------|
+| Block | Still life | — | 4 |
+| Blinker | Oscilator | $p = 2$ | 3 |
+| Glider | Nava spațială | $c/4$ diagonal | 5 |
+| Gosper Glider Gun | Gun | $p = 30$ | 36 |
+| Pulsar | Oscilator | $p = 3$ | 48 |
+| LWSS | Nava spațială | $c/2$ orizontal | 9 |
+| Methuselah R-pentomino | Haotic | ~1100 gen. până stabilizare | 5 |
+
+**R-pentomino** merită o mențiune specială: 5 celule vii într-o configurație în formă de R evoluează haotic timp de 1103 generații înainte de a se stabiliza, producând 116 celule vii, 8 glideri și mai mulți oscilatoare. Un exemplu perfect al impredictibilității din simplitate.
+
+---
+
+## Notație și generalizări
+
+Game of Life este regula **B3/S23** dintr-o familie vastă de automate celulare cu același tip de grilă și vecinătate:
+
+- **HighLife (B36/S23)** — are auto-replicatori mai simpli decât Life.
+- **Seeds (B2/S)** — orice celulă vie moare imediat; creștere explozivă din semințe.
+- **Day & Night (B3678/S34678)** — simetric între viu și mort; comportament similar cu Life.
+- **Smooth Life** — generalizare continuă pe grilă reală, cu comportamente asemănătoare vieții biologice.
+
+Familia completă a automatelor celulare cu vecinătate Moore și 2 stări are $2^{2^9} = 2^{512}$ reguli posibile — un spațiu imens din care B3/S23 s-a dovedit cel mai bogat.
+
+---
+
+## Concluzie
+
+Conway's Game of Life demonstrează că **complexitatea nu necesită reguli complexe**. Patru reguli, două stări, o grilă infinită — și obții un univers Turing-complet, capabil de auto-replicare, calcul arbitrar și comportament impredictibil.
+
+Este un argument matematic pentru emergență: proprietăți globale sofisticate (calculabilitate, auto-organizare, structuri stabile) nu sunt prezente în reguli, ci apar din interacțiunile locale. Aceasta este, poate, și lecția cea mai profundă despre complexitatea din lumea reală.
+
+Puteți vedea mai jos o variantă interactivă a regulilor descrise, unde puteți desena configurații proprii și urmări evoluția lor pas cu pas.
