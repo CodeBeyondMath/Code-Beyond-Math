@@ -416,8 +416,14 @@ Proiect realizat în cadrul competiției **InfoEducație 2026**, categoria *Soft
 
 | Nume | Rol |
 |---|---|
-| **Frățeanu Iustin-Alexandru** | Co-autor - contributor principal |
-| **Caunic Rareș-Octavian** | Co-autor - contributor secundar |
+| **Frățeanu Iustin-Alexandru** | Co-autor & Expert Informatică |
+||- Calificat la Olimpiada Națională AcadNet secțiunea IS |
+||- Admis în tabăra ACTS 2026.2 pe track-ul de Software Engineering |
+||- Responsabil pentru arhitectura tehnică și algoritmi |
+| **Caunic Rareș-Octavian** | Co-autor & Expert Matematică |
+||- Calificat la Olimpiada Națională de Matematică |
+||- Pasionat de informatică și șah |
+||- Responsabil pentru documentația matematică și probleme |
 
 ---
 
