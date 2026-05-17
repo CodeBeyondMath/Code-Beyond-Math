@@ -5,7 +5,7 @@
   <p>
     <a href="https://codebeyondmath.github.io/Code-Beyond-Math/">Website live</a> &nbsp;·&nbsp;
     <a href="#viii-demo-uri-și-capturi-de-ecran">Demo</a> &nbsp;·&nbsp;
-    <a href="#ix-echipă-și-contact">Contact</a>
+    <a href="#x-contact">Contact</a>
   </p>
 </div>
 
