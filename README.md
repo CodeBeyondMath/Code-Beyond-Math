@@ -416,8 +416,8 @@ Proiect realizat în cadrul competiției **InfoEducație 2026**, categoria *Soft
 
 | Nume | Rol |
 |---|---|
-| **Frățeanu Iustin-Alexandru** | Co-autor |
-| **Caunic Rareș-Octavian** | Co-autor |
+| **Frățeanu Iustin-Alexandru** | Co-autor - contributor principal |
+| **Caunic Rareș-Octavian** | Co-autor - contributor secundar |
 
 ---
 
