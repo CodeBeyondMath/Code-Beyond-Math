@@ -3,9 +3,9 @@
   <h1>Code Beyond Math</h1>
   <p><em>Explorează matematica și informatica dincolo de manual.</em></p>
   <p>
-    <a href="https://codebeyondmath.github.io/Code-Beyond-Math/">🌐 Website live</a> &nbsp;·&nbsp;
-    <a href="#viii-demo-uri-și-capturi-de-ecran">📸 Demo</a> &nbsp;·&nbsp;
-    <a href="#ix-echipă-și-contact">📬 Contact</a>
+    <a href="https://codebeyondmath.github.io/Code-Beyond-Math/">Website live</a> &nbsp;·&nbsp;
+    <a href="#viii-demo-uri-și-capturi-de-ecran">Demo</a> &nbsp;·&nbsp;
+    <a href="#ix-echipă-și-contact">Contact</a>
   </p>
 </div>
 
@@ -21,7 +21,8 @@
 6. [Securitate și API](#vi-securitate-și-api)
 7. [Deployment](#vii-deployment)
 8. [Demo-uri și Capturi de Ecran](#viii-demo-uri-și-capturi-de-ecran)
-9. [Echipă și Contact](#ix-echipă-și-contact)
+9. [Echipa](#ix-echipa)
+10. [Contact](#x-contact)
 
 ---
 
@@ -410,7 +411,7 @@ Site-ul live: **[codebeyondmath.github.io/Code-Beyond-Math](https://codebeyondma
 
 ---
 
-## IX. Echipă și Contact
+## IX. Echipa
 
 Proiect realizat în cadrul competiției **InfoEducație 2026**, categoria *Software cu caracter educațional*.
 
@@ -424,6 +425,10 @@ Proiect realizat în cadrul competiției **InfoEducație 2026**, categoria *Soft
 ||- Calificat la Olimpiada Națională de Matematică |
 ||- Pasionat de informatică și șah |
 ||- Responsabil pentru documentația matematică și probleme |
+
+## X. Contact
+
+- **Email**: codebeyondmath@gmail.com
 
 ---
 
